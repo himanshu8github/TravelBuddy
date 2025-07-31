@@ -1,30 +1,10 @@
 import Navbar from '../components/Navbar';
 import HeroSection from '../components/HeroSection';
 import PlacesComponent from '../components/Places';
-
-const HowItWorks = () => (
-  <section id="how-it-works" className="h-screen flex items-center justify-center bg-white">
-    <h2 className="text-3xl font-semibold">How It Works</h2>
-  </section>
-);
-
-const Pricing = () => (
-  <section id="pricing" className="h-screen flex items-center justify-center bg-gray-100">
-    <h2 className="text-3xl font-semibold">Pricing Plans</h2>
-  </section>
-);
-
-const Reviews = () => (
-  <section id="reviews" className="h-screen flex items-center justify-center bg-white">
-    <h2 className="text-3xl font-semibold">Customer Reviews</h2>
-  </section>
-);
-
-const Contact = () => (
-  <section id="contact" className="h-screen flex items-center justify-center bg-gray-100">
-    <h2 className="text-3xl font-semibold">Contact Us</h2>
-  </section>
-);
+import HowItWork from "../components/HowItWork";
+import Pricing from '../components/Pricing'
+import Reviews from '../components/Review'
+import Footer from '../components/Footer'
 
 function Home() {
   return (
@@ -39,10 +19,21 @@ function Home() {
         <PlacesComponent />
       </section>
 
-      <HowItWorks />
-      <Pricing />
-      <Reviews />
-      <Contact />
+        <section id="how-it-works">
+        <HowItWork />
+      </section>
+        <section id="pricing">
+        <Pricing />
+      </section>
+         <section id="reviews">
+        <Reviews />
+      </section>
+           <section id="contact">
+        <Footer />
+      </section>
+
+
+   
     </>
   );
 }

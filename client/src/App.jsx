@@ -1,15 +1,15 @@
-import Home from './pages/Home';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Explore from "./pages/Explore";
+import Destination from "./pages/Destination";
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        {/* Add more routes below */}
-        {/* <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/dashboard" element={<Dashboard />} /> */}
+        {/* <Route path="/explore" element={<Explore />} /> */}
+        <Route path="/destination/:id" element={<Destination />} />
       </Routes>
     </Router>
   );
