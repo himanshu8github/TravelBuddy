@@ -1,12 +1,23 @@
 import { useState } from "react";
-import { Input} from "@/components/ui/input";
-import {Select, SelectTrigger, SelectValue, SelectContent, SelectItem} from "@/components/ui/select";
-import { Label} from "@/components/ui/label";
-import { Card, CardHeader, CardTitle, CardContent} from "@/components/ui/card";
-import {Button} from "@/components/ui/button";
-import { FaChevronDown } from "react-icons/fa";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-
+import { signOut } from "firebase/auth";
+import { auth } from "@/firebase"; // make sure your firebase file exports `auth`
 
 const Itenary = () => {
   const navigate = useNavigate();
@@ -28,23 +39,21 @@ const Itenary = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Basic validation
     if (!formData.destination || !formData.from || !formData.to) {
       alert("Please fill out all required fields.");
       return;
     }
 
     setLoading(true);
-
-    // Simulate API call
     await new Promise((res) => setTimeout(res, 1000));
 
     console.log("Trip Data:", formData);
-
-    // TODO: Send to backend or Gemini API
-
     setLoading(false);
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    navigate("/home");
   };
 
   return (
@@ -57,8 +66,26 @@ const Itenary = () => {
         >
           TravelBuddy
         </h1>
-       
- 
+        <div className="space-x-4">
+          <Button
+            className="bg-white text-black hover:bg-purple-800"
+            onClick={() => navigate("/dashboard")}
+          >
+            Home
+          </Button>
+          <Button
+            className="bg-white text-black hover:bg-purple-800"
+            onClick={() => navigate("/aiplanner")}
+          >
+            AI Planner
+          </Button>
+          <Button
+            className="bg-red-600 hover:bg-red-700"
+            onClick={handleLogout}
+          >
+            Logout
+          </Button>
+        </div>
       </nav>
 
       {/* Form Card */}
@@ -73,7 +100,9 @@ const Itenary = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Destination */}
               <div>
-                <Label className="text-white">Destination</Label>
+                <Label className="text-black text-lg">
+                  Where do you want to go?
+                </Label>
                 <Input
                   placeholder="e.g. Rishikesh"
                   value={formData.destination}
@@ -83,7 +112,9 @@ const Itenary = () => {
 
               {/* People */}
               <div>
-                <Label className="text-white">Number of People</Label>
+                <Label className="text-black text-lg">
+                  How many people are going?
+                </Label>
                 <Input
                   type="number"
                   min={1}
@@ -97,7 +128,7 @@ const Itenary = () => {
               {/* Dates */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-white">From</Label>
+                  <Label className="text-black text-lg">From which date?</Label>
                   <Input
                     type="date"
                     value={formData.from}
@@ -105,7 +136,7 @@ const Itenary = () => {
                   />
                 </div>
                 <div>
-                  <Label className="text-white">To</Label>
+                  <Label className="text-black text-lg">To which date?</Label>
                   <Input
                     type="date"
                     value={formData.to}
@@ -116,7 +147,9 @@ const Itenary = () => {
 
               {/* Budget */}
               <div>
-                <Label className="text-white">Budget</Label>
+                <Label className="text-black text-lg">
+                  What is your budget?
+                </Label>
                 <Select
                   value={formData.budget}
                   onValueChange={(value) => handleChange("budget", value)}
@@ -134,7 +167,9 @@ const Itenary = () => {
 
               {/* Travel Group */}
               <div>
-                <Label className="text-white">Travel With</Label>
+                <Label className="text-black text-lg">
+                  Who are you traveling with?
+                </Label>
                 <Select
                   value={formData.group}
                   onValueChange={(value) => handleChange("group", value)}

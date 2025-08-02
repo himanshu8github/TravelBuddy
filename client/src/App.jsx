@@ -6,6 +6,9 @@ import Explore from "./pages/Explore";
 import Destination from "./pages/Destination";
 import Dashboard from './pages/Dashboard';
 import Itenary from "./pages/Itenary";
+import AiPlanner from "./pages/AiPlanner";
+import History from './pages/History';
+import ExpenseTracker from "./pages/ExpenseTracker";
 
 
 function App() {
@@ -19,6 +22,10 @@ function App() {
         <Route path="/destination/:id" element={<Destination />} />
            <Route path="/dashboard" element={<Dashboard />} />
            <Route path="/itenary" element={<Itenary />} />
+            <Route path="/aiplanner" element={<AiPlanner />} />
+            <Route path="/history" element={<History />}/>
+               <Route path="/expense" element={<ExpenseTracker />}/>
+
       </Routes>
     </Router>
   );
