@@ -5,6 +5,7 @@ import Login from './pages/Login'
 import Explore from "./pages/Explore";
 import Destination from "./pages/Destination";
 import Dashboard from './pages/Dashboard';
+import Itenary from "./pages/Itenary";
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
         <Route path="/destination/:id" element={<Destination />} />
            <Route path="/dashboard" element={<Dashboard />} />
+           <Route path="/itenary" element={<Itenary />} />
       </Routes>
     </Router>
   );
