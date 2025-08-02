@@ -9,7 +9,7 @@ import Nav from "../components/Nav";
 const Signup = () => {
   const navigate = useNavigate();
   const [success, setSuccess] = useState(false);
-  const [loading, setLoading] = useState(false); // ✅ You missed this line
+  const [loading, setLoading] = useState(false); 
 
   const handleGoogleSignup = async () => {
     if (loading) return;
@@ -48,7 +48,7 @@ const Signup = () => {
             onClick={handleGoogleSignup}
             className="w-full flex items-center justify-center gap-2 bg-white text-black border"
             variant="outline"
-            disabled={loading} // 🔒 Disable while signing up
+            disabled={loading} //  Disable while signing up
           >
             <FcGoogle size={20} />
             {loading ? "Signing up..." : "Sign Up with Google"}
@@ -56,7 +56,7 @@ const Signup = () => {
 
           {success && (
             <div className="mt-4 text-green-600 font-semibold">
-              ✅ Successfully signed up!
+               Successfully signed up!
             </div>
           )}
         </div>

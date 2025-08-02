@@ -8,7 +8,8 @@ const PlaceCard = ({ id, name, image, description }) => {
   const navigate = useNavigate();
 
   return (
-    <Card className="w-80 p-0 overflow-hidden hover:shadow-xl transition duration-300 cursor-pointer">
+   <div className="bg-black">
+     <Card className="w-80 p-0 overflow-hidden hover:shadow-xl transition duration-300 cursor-pointer">
       <CardHeader className="p-0 ">
         <img
           src={image}
@@ -30,6 +31,7 @@ const PlaceCard = ({ id, name, image, description }) => {
 </CardContent>
 
     </Card>
+   </div>
   );
 };
 

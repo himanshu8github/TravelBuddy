@@ -22,7 +22,7 @@ const Login = () => {
       setSuccess(true);
 
       setTimeout(() => {
-        navigate("/dashboard"); // 🔁 Redirect to dashboard
+        navigate("/dashboard"); //  Redirect to dashboard
       }, 1000);
     } catch (error) {
       console.error("Google login error:", error.message);
@@ -33,12 +33,11 @@ const Login = () => {
 
   return (
     <>
-      {/* Navbar fixed at top */}
+   
       <div className="fixed top-0 left-0 w-full z-50">
         <Nav />
       </div>
 
-      {/* Page content with padding to offset navbar height */}
       <div className="bg-black min-h-screen pt-24 flex items-center justify-center">
         <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md text-center">
           <h2 className="text-3xl font-bold mb-4 text-black">Welcome to TravelBuddy</h2>
