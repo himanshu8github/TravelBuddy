@@ -10,6 +10,8 @@ import AiPlanner from "./pages/AiPlanner";
 import History from './pages/History';
 import ExpenseTracker from "./pages/ExpenseTracker";
 import Payment from "./pages/Payment"
+import Success from "./pages/Success";
+import Cancel from "./pages/Cancel";
 
 
 function App() {
@@ -28,6 +30,8 @@ function App() {
             <Route path="/paiduser" element={<Payment />} />
             <Route path="/history" element={<History />}/>
                <Route path="/expense" element={<ExpenseTracker />}/>
+                 <Route path="/success" element={<Success />} />
+        <Route path="/cancel" element={<Cancel />} />
 
       </Routes>
     </Router>

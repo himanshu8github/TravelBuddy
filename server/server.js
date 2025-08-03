@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import geminiRoute from "./routes/gemini.route.js";
 import chatbotRoute from "./routes/chat.route.js";
 import paymentRoute from "./routes/stripe.route.js"
+import Webhookstripe from './routes/stripe.webhook.route.js'
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use("/api", geminiRoute);
 app.use("/api/chat-suggestions", chatbotRoute);
 app.use("/api/payment", paymentRoute);
+app.use("/api/stripe", webhookRoute);
 
 app.get("/", (req, res) => {
   res.send("API is running...");
