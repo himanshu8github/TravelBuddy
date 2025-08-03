@@ -16,7 +16,7 @@ const PlacesComponent = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
         {previewPlaces.map((group, index) => (
-          <div key={index} className="bg-gray-900 rounded-xl p-4">
+          <div key={index} className="bg-gray-900 rounded-xl p-4"  onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-semibold mb-2">{group.state}</h3>
             <ul className="list-disc list-inside text-gray-300">
               {group.destinations.slice(0, 2).map((dest, idx) => (

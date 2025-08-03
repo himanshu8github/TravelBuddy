@@ -20,7 +20,7 @@ const HomeExplore = () => {
         {previewData.map((group, index) => (
         <Card
   key={index}
-  onClick={() => navigate("/explore")}
+  onClick={() => navigate("/signup")}
   className="cursor-pointer bg-white text-black rounded-xl overflow-hidden shadow-lg hover:scale-[1.02] transition-all p-0"
 >
   <div className="w-full h-48">
