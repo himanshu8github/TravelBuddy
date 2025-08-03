@@ -1,35 +1,40 @@
+import React from "react";
 import places from "../data/places";
-import PlaceCard from "../components/PlaceCard";
+import PlaceCard from "./PlaceCard"; // you can customize this
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
-const PlacesComponent = () => (
-  <section id="places" className="pt-24 scroll-mt-20 text-white bg-black">
-    <div className="text-center mb-8">
-      <h2 className="text-3xl font-bold">Popular Destinations</h2>
-      <p className="text-gray-400 mt-2 text-sm">
-        Handpicked places loved by travelers across India.
-      </p>
-    </div>
+const PlacesComponent = () => {
+  const navigate = useNavigate();
+  const previewPlaces = places.slice(0, 4); // Show only 4 states
 
-    <div className="flex flex-wrap justify-center gap-6 px-4">
-      {places.slice(0, 4).map((place) => (
-        <PlaceCard
-          key={place.id}
-          name={place.name}
-          description={place.description}
-          state={place.state}
-          // Ensure the image path is absolute from public folder
-          image={place.image.startsWith('/') ? place.image : `/${place.image}`}
-        />
-      ))}
-    </div>
+  return (
+    <section className="pt-24 scroll-mt-20 text-white bg-black">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold">Popular Destinations</h2>
+        <p className="text-gray-400">Top places loved by travelers across India.</p>
+      </div>
 
-    <div className="text-center mt-8">
-      <Button onClick={() => window.location.href = "/explore"}>
-        Explore More
-      </Button>
-    </div>
-  </section>
-);
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        {previewPlaces.map((group, index) => (
+          <div key={index} className="bg-gray-900 rounded-xl p-4">
+            <h3 className="text-xl font-semibold mb-2">{group.state}</h3>
+            <ul className="list-disc list-inside text-gray-300">
+              {group.destinations.slice(0, 2).map((dest, idx) => (
+                <li key={idx}>{dest}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <div className="text-center mt-10">
+        <Button onClick={() => navigate("/explore")} className="bg-purple-700 hover:bg-purple-800 text-white">
+          Explore More
+        </Button>
+      </div>
+    </section>
+  );
+};
 
 export default PlacesComponent;

@@ -3,19 +3,19 @@ import { Button } from "@/components/ui/button";
 
 const plans = [
   {
-    title: "Free",
-    price: "₹99/mo",
-    features: ["2 trip/month", "Basic itinerary", "Limited support"],
+    title: "Basic",
+    price: "₹49/Yr",
+    features: ["1 trip/month", "Basic itinerary", "Limited support"],
   },
   {
     title: "Pro",
-    price: "₹199/mo",
+    price: "₹149/Yr",
     features: ["Unlimited trips", "Advanced itinerary", "Priority support"],
   },
   {
     title: "Ultimate",
-    price: "₹299/mo",
-    features: ["Everything is Premium", "Group planning", "Premium hotels"],
+    price: "₹299/Yr",
+    features: ["Everything is Premium", "Group planning", "Premium hotels", "24/7 Support"],
   },
 ];
 

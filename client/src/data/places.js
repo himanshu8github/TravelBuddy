@@ -1,3 +1,32 @@
+
+
+export const HomePlaces = () => {
+  return [
+    {
+      state: "Himachal Pradesh",
+      destinations: ["Manali"],
+      image: "/himachal.jpeg",
+    },
+    {
+      state: "Goa",
+      destinations: ["Goa Beach"],
+      image: "/goa.jpeg",
+    },
+    {
+      state: "Uttrakhand",
+      destinations: ["Rishikesh"],
+      image: "/rishikesh.jpeg",
+    },
+    {
+      state: "Kashmir",
+      destinations: ["Sonmarg"],
+      image: "/kashmir.jpeg",
+    },
+  ];
+};
+
+
+
 const places = [
   {
     state: "Uttar Pradesh",
@@ -186,6 +215,7 @@ const places = [
   },
 ];
 export default places;
+
 
 
 //   // Goa

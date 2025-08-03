@@ -1,6 +1,6 @@
 import Navbar from '../components/Navbar';
 import HeroSection from '../components/HeroSection';
-import PlacesComponent from '../components/Places';
+import HomeExplore from '../components/HomeExplore';
 import HowItWork from "../components/HowItWork";
 import Pricing from '../components/Pricing'
 import Reviews from '../components/Review'
@@ -14,10 +14,9 @@ function Home() {
       <section id="hero">
         <HeroSection />
       </section>
-
-      <section id="places">
-        <PlacesComponent />
-      </section>
+<section id="places">
+  <HomeExplore />
+</section>
 
         <section id="how-it-works">
         <HowItWork />
