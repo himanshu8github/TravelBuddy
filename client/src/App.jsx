@@ -29,7 +29,7 @@ function App() {
                    <Route path="/paidplans" element={<PaidPlans />} />
            <Route path="/itenary" element={<Itenary />} />
             <Route path="/aiplanner" element={<AiPlanner />} />
-            <Route path="/paiduser" element={<Payment />} />
+            <Route path="/payment" element={<Payment />} />
             <Route path="/history" element={<History />}/>
                <Route path="/expense" element={<ExpenseTracker />}/>
                  <Route path="/success" element={<Success />} />

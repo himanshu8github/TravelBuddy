@@ -5,11 +5,13 @@ import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Nav from "../components/Nav";
+import useAuthStore from "../store/authstore";
 
 const Login = () => {
   const navigate = useNavigate();
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+ 
 
   const handleGoogleLogin = async () => {
     if (loading) return;
@@ -19,6 +21,13 @@ const Login = () => {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       console.log("User logged in:", result.user);
+
+      useAuthStore.getState().setUser({
+  uid: result.user.uid,
+  name: result.user.displayName,
+  email: result.user.email,
+});
+
       setSuccess(true);
 
       setTimeout(() => {
