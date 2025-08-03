@@ -34,18 +34,5 @@ TravelBuddy is an AI-powered full-stack travel app that helps users plan persona
 
 🙋‍♂️ Author
 Made with 💜 by Himanshu Choudhary
-📧 himanshuc.dev@gmail.com
-🌐 Portfolio | GitHub
-
-🙋‍♂️ Author
-Made with 💜 by Himanshu Choudhary
-📧 himanshuc.dev@gmail.com
-🌐 Portfolio | GitHub
-
-🙋‍♂️ Author
-Made with 💜 by Himanshu Choudhary
 📧 himanshukakran8@gmail.com
-
-
-
-
+🌐 Portfolio | GitHub
