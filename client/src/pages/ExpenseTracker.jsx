@@ -1,18 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { onAuthStateChanged } from "firebase/auth";
+import {Select,SelectContent, SelectItem, SelectTrigger,SelectValue,} from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
-import { auth } from "@/firebase";
+import { serverTimestamp } from "firebase/firestore";
+import { auth, db } from "@/firebase";
+import { collection, addDoc, onSnapshot, query, where, orderBy,} from "firebase/firestore";
 
 const ExpenseTracker = () => {
   const navigate = useNavigate();
@@ -23,6 +20,36 @@ const ExpenseTracker = () => {
   const [description, setDescription] = useState("");
   const [type, setType] = useState("added");
 
+  useEffect(() => {
+  const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+    if (!user) return;
+
+    const q = query(
+      collection(db, "expenses"),
+      where("uid", "==", user.uid),
+      // orderBy("createdAt", "desc")
+    );
+
+    const unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
+      const list = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      console.log("Fetched expenses:", list); 
+  setExpenses(list);
+    });
+
+    // Cleanup Firestore listener
+    return () => unsubscribeSnapshot();
+  });
+
+  // Cleanup Auth listener
+  return () => unsubscribeAuth();
+}, []);
+
+
+
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -32,20 +59,33 @@ const ExpenseTracker = () => {
     }
   };
 
-  const handleAddExpense = () => {
+  const handleAddExpense = async () => {
     if (!name || !amount || !type) return;
+
+     const user = auth.currentUser;
+  if (!user) return alert("You must be logged in");
+
     const newExpense = {
+      uid: user.uid,
       name,
       amount: parseFloat(amount),
       description,
       type,
+       createdAt: serverTimestamp(),
     };
-    setExpenses([newExpense, ...expenses]);
+
+     try {
+    await addDoc(collection(db, "expenses"), newExpense);
+    // setExpenses([newExpense, ...expenses]);
     setName("");
     setAmount("");
     setDescription("");
     setType("added");
-  };
+  }catch (error) {
+    console.error("Error adding expense:", error);
+  }
+};
+
 
   const totalAdded = expenses
     .filter((e) => e.type === "added")
