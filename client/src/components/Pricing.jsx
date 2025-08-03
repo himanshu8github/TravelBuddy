@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const plans = [
   {
@@ -20,6 +21,15 @@ const plans = [
 ];
 
 const Pricing = () => {
+
+ const navigate = useNavigate();
+ 
+   const handleUpgradeClick = () => {
+    navigate("/signup");
+  };
+
+
+
   return (
     <div className="bg-black pt-24 scroll-mt-20 text-white py-12">
       <h1 className="text-3xl font-bold text-center mb-10">Our Paid Plans</h1>
@@ -38,7 +48,7 @@ const Pricing = () => {
                   <li key={i}>{feature}</li>
                 ))}
               </ul>
-              <Button className="bg-black text-white hover:bg-purple-600 w-full">
+              <Button className="bg-black text-white hover:bg-purple-600 w-full"    onClick={handleUpgradeClick}>
                 {plan.title === "Free" ? "Get Started" : "Upgrade"}
               </Button>
             </CardContent>
