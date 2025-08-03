@@ -17,3 +17,5 @@ export const provider = new GoogleAuthProvider();
 export const db = getFirestore(app);  // Firestore DB
 export const auth = getAuth(app);     // Auth
 
+export default app;
+

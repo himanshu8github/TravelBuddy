@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
+import { getAuth, signOut } from 'firebase/auth';
 
 const ItineraryPlanner = () => {
   const [form, setForm] = useState({
@@ -12,6 +13,7 @@ const ItineraryPlanner = () => {
   });
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -30,117 +32,141 @@ const ItineraryPlanner = () => {
     }
   };
 
+  const handleLogout = async () => {
+    const auth = getAuth();
+    try {
+      await signOut(auth);
+      navigate('/'); // Redirect to home after logout
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
+  };
+
   const handleConfirm = () => {
-    // Logic to save to MongoDB can be written here
     console.log("Confirmed! Save this plan to DB.");
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white font-sans">
       {/* Navbar */}
-      <div className="bg-black p-4 shadow-md flex justify-between items-center">
+      <nav className="bg-black px-6 py-4 shadow-md flex justify-between items-center">
         <h1 className="text-3xl font-bold text-white">TravelBuddy</h1>
-        <div className="space-x-4">
-          <Link to='/aiplanner' className="text-white u">AI Planner</Link>
-          <Button className="bg-red-700 hover:bg-red-800 text-white">Logout</Button>
+        <div className="space-x-6">
+          <Link to='/aiplanner' className="text-white hover:text-purple-300 text-lg">AI Planner</Link>
+          <Button onClick={handleLogout} className="bg-red-700 hover:bg-red-800 text-white px-4">Logout</Button>
         </div>
-      </div>
+      </nav>
 
-      <div className="p-6 max-w-5xl mx-auto">
-        <h1 className='font-bold text-4xl text-center mb-2'>Welcome to TravelBuddy</h1>
-        <h3 className='font-bold text-xl text-center mb-8'>Start planning your trip with us!</h3>
+      {/* Main Section */}
+      <div className="p-6 max-w-6xl mx-auto">
+        <h1 className='text-4xl font-bold text-center mt-6 mb-2 text-purple-300'>Plan Your Next Adventure</h1>
+        <p className='text-center text-lg text-gray-300 mb-10'>Fill in the details and get a personalized itinerary.</p>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white text-black rounded-lg shadow-md p-6 grid gap-4 grid-cols-1 md:grid-cols-2">
+        <form onSubmit={handleSubmit} className="bg-white text-black rounded-lg shadow-lg p-6 grid gap-4 grid-cols-1 md:grid-cols-2">
           <h2 className="col-span-full text-xl font-semibold text-gray-800">✈️ Trip Details</h2>
 
-          <input type="text" name="destination" placeholder="Destination (e.g. Rishikesh)" onChange={handleChange} className="border p-2 rounded" required />
-          <input type="number" name="days" placeholder="Number of Days" onChange={handleChange} className="border p-2 rounded" required />
-          
-          <select name="groupType" onChange={handleChange} className="border p-2 rounded" required>
-            <option value="">Group Type</option>
-            <option value="friends">Friends</option>
-            <option value="family">Family</option>
-            <option value="couple">Couple</option>
-            <option value="solo">Solo</option>
-          </select>
+          <div className="col-span-full">
+            <label className="block text-sm font-medium mb-1">Where do you want to go?</label>
+            <input type="text" name="destination" placeholder="e.g. Rishikesh" onChange={handleChange} className="border p-2 rounded w-full" required />
+          </div>
 
-          <select name="budget" onChange={handleChange} className="border p-2 rounded" required>
-            <option value="">Budget</option>
-            <option value="cheap">Cheap</option>
-            <option value="moderate">Moderate</option>
-            <option value="luxury">Luxury</option>
-          </select>
+          <div>
+            <label className="block text-sm font-medium mb-1">How many days?</label>
+            <input type="number" name="days" placeholder="Number of Days" onChange={handleChange} className="border p-2 rounded w-full" required />
+          </div>
 
-          <button type="submit" className="col-span-full bg-black hover:bg-gray-900 text-white py-2 rounded mt-2">
+          <div>
+            <label className="block text-sm font-medium mb-1">With whom?</label>
+            <select name="groupType" onChange={handleChange} className="border p-2 rounded w-full" required>
+              <option value="">Select</option>
+              <option value="friends">Friends</option>
+              <option value="family">Family</option>
+              <option value="couple">Couple</option>
+              <option value="solo">Solo</option>
+            </select>
+          </div>
+
+          <div className="col-span-full">
+            <label className="block text-sm font-medium mb-1">Your budget preference</label>
+            <select name="budget" onChange={handleChange} className="border p-2 rounded w-full" required>
+              <option value="">Select Budget</option>
+              <option value="cheap">Cheap</option>
+              <option value="moderate">Moderate</option>
+              <option value="luxury">Luxury</option>
+            </select>
+          </div>
+
+          <button type="submit" className="col-span-full bg-purple-700 hover:bg-purple-800 text-white py-2 rounded mt-2 font-semibold">
             {loading ? "Generating..." : "Generate Itinerary"}
           </button>
         </form>
 
         {/* Output Cards */}
         {result && (
-          <div className="mt-12 space-y-10">
+          <div className="mt-16 space-y-14">
 
             {/* Stays */}
-            <div>
-              <h2 className="text-2xl font-bold mb-4 text-white">🏨 Suggested Stays</h2>
-              <div className="grid gap-6 md:grid-cols-2">
+            <section>
+              <h2 className="text-3xl font-bold mb-6 text-purple-400">🏨 Suggested Stays</h2>
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {result.hostels?.map((hostel, idx) => (
-                  <div key={idx} className="bg-white text-black p-4 rounded-lg shadow">
-                    <h3 className="font-semibold text-lg">{hostel.name}</h3>
-                    <p className="text-sm">{hostel.location}</p>
-                    <p className="mt-1">💵 <strong>{hostel.pricePerNight}</strong> per night</p>
-                    <p className="mt-1">⭐ {hostel.rating}</p>
-                    <p className="mt-2 text-sm">{hostel.description}</p>
+                  <div key={idx} className="bg-white text-black p-4 rounded-xl shadow-lg">
+                    <h3 className="text-xl font-bold text-purple-700">{hostel.name}</h3>
+                    <p className="text-sm text-gray-700">{hostel.location}</p>
+                    <p className="mt-1">💵 <strong>{hostel.pricePerNight}</strong> / night</p>
+                    <p>⭐ {hostel.rating}</p>
+                    <p className="text-sm mt-2">{hostel.description}</p>
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
 
             {/* Restaurants */}
-            <div>
-              <h2 className="text-2xl font-bold mb-4 text-white">🍽️ Recommended Restaurants</h2>
-              <div className="grid gap-6 md:grid-cols-2">
+            <section>
+              <h2 className="text-3xl font-bold mb-6 text-purple-400">🍽️ Recommended Restaurants</h2>
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {result.restaurants?.map((restro, idx) => (
-                  <div key={idx} className="bg-white text-black p-4 rounded-lg shadow">
-                    <h3 className="font-semibold text-lg">{restro.name}</h3>
-                    <p className="text-sm">{restro.location}</p>
-                    <p className="mt-1">🍛 Cuisine: {restro.cuisine}</p>
-                    <p className="mt-1">💵 Avg. Food Price: {restro.avgPrice}</p>
-                    <p className="mt-1">⭐ {restro.rating}</p>
-                    <p className="mt-2 text-sm">{restro.description}</p>
+                  <div key={idx} className="bg-white text-black p-4 rounded-xl shadow-lg">
+                    <h3 className="text-xl font-bold text-purple-700">{restro.name}</h3>
+                    <p className="text-sm text-gray-700">{restro.location}</p>
+                    <p>🍛 Cuisine: {restro.cuisine}</p>
+                    <p>💵 Avg. Price: {restro.avgPrice}</p>
+                    <p>⭐ {restro.rating}</p>
+                    <p className="text-sm mt-2">{restro.description}</p>
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
 
             {/* Day-wise Itinerary */}
-            <div>
-              <h2 className="text-2xl font-bold mb-4 text-white">🗓️ Day-wise Itinerary</h2>
-              {result.itinerary?.map((dayPlan, dayIdx) => (
-                <div key={dayIdx} className="bg-white text-black rounded-lg shadow p-4 mb-6">
-                  <h3 className="text-lg font-semibold mb-2">Day {dayPlan.day}</h3>
-                  <div className="space-y-2">
-                    {dayPlan.activities?.map((act, actIdx) => (
-                      <div key={actIdx} className="border border-gray-300 p-3 rounded bg-gray-50">
-                        <p className="font-semibold">{act.placeName}</p>
-                        <p className="text-sm">{act.details}</p>
-                        <p className="text-sm">🕒 Travel Time: {act.travelTime}</p>
-                        <p className="text-sm">🎟️ Ticket Price: {act.ticketPrice}</p>
-                      </div>
-                    ))}
+            <section>
+              <h2 className="text-3xl font-bold mb-6 text-purple-400">🗓️ Day-wise Itinerary</h2>
+              <div className="space-y-6">
+                {result.itinerary?.map((dayPlan, dayIdx) => (
+                  <div key={dayIdx} className="bg-white text-black p-6 rounded-xl shadow-lg">
+                    <h3 className="text-xl font-bold text-purple-700 mb-2">Day {dayPlan.day}</h3>
+                    <div className="space-y-3">
+                      {dayPlan.activities?.map((act, actIdx) => (
+                        <div key={actIdx} className="bg-gray-100 border-l-4 border-purple-600 p-4 rounded">
+                          <p className="font-semibold">{act.placeName}</p>
+                          <p className="text-sm">{act.details}</p>
+                          <p className="text-sm">🕒 Travel Time: {act.travelTime}</p>
+                          <p className="text-sm">🎟️ Ticket Price: {act.ticketPrice}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </section>
 
             {/* Confirm Button */}
-            <div className="flex justify-center mt-8">
-              <button onClick={handleConfirm} className="bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded text-lg">
+            <div className="flex justify-center mt-10">
+              <button onClick={handleConfirm} className="bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-xl text-lg font-semibold transition">
                 ✅ Confirm This Plan
               </button>
             </div>
-
           </div>
         )}
       </div>

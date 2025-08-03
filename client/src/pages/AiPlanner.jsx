@@ -1,95 +1,145 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import React, { useState } from "react";
+import axios from "axios";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { signOut } from "firebase/auth";
-import { auth } from "@/firebase";
+import { getAuth, signOut } from "firebase/auth";
+import app from "../firebase.js"; // adjust path if needed
 
 const AiPlanner = () => {
-  const navigate = useNavigate();
-  const [userInput, setUserInput] = useState("");
+  const [prompt, setPrompt] = useState("");
   const [responses, setResponses] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const auth = getAuth(app);
 
-  const handleLogout = async () => {
+  const handleSignOut = async () => {
     try {
       await signOut(auth);
-      navigate("/");
+      navigate("/login");
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error("Logout error:", error);
     }
   };
 
-  const handlePrompt = () => {
-    if (!userInput.trim()) return;
-
-    const newResponse = {
-      question: userInput,
-      answer: getAIResponse(userInput),
-    };
-
-    setResponses([...responses, newResponse]);
-    setUserInput("");
-  };
-
-  // Mock Gemini-like response function
-  const getAIResponse = (input) => {
-    const lower = input.toLowerCase();
-    if (lower.includes("mountain")) return "Here are some mountain destinations in India: Manali, Shimla, Leh, and Mussoorie.";
-    if (lower.includes("holy")) return "You might like: Rishikesh, Varanasi, Haridwar, and Amritsar.";
-    if (lower.includes("beach")) return "Top beaches in India: Goa, Gokarna, Kovalam, and Andaman Islands.";
-    return "Sorry, I couldn't understand that. Try asking about mountains, beaches, or holy places.";
+  const handleGenerate = async () => {
+    if (!prompt) return;
+    setLoading(true);
+    try {
+      const res = await axios.post("http://localhost:5000/api/generate-itinerary", {
+        prompt,
+      });
+      setResponses([...responses, res.data]);
+    } catch (err) {
+      console.error(err);
+      alert("Error generating itinerary");
+    }
+    setLoading(false);
   };
 
   return (
-    <div className="bg-black text-white min-h-screen">
-      {/* Navbar */}
-      <nav className="flex justify-between items-center px-6 py-4 bg-black shadow-md fixed top-0 w-full z-10">
-        <h1
-          className="text-3xl font-bold cursor-pointer"
-          onClick={() => navigate("/home")}
-        >
-          TravelBuddy
-        </h1>
+    <div className="min-h-screen bg-black text-white px-4 pb-20">
+      {/* Custom Navbar */}
+      <div className="flex justify-between items-center px-6 py-4 border-b border-gray-700 bg-black shadow-md sticky top-0 z-50">
+        <h1 className="text-xl font-bold text-white">TravelBuddy</h1>
         <div className="space-x-4">
-          <Button className="bg-white text-black hover:bg-purple-800" onClick={() => navigate("/dashboard")}>
+          <Button variant="ghost" onClick={() => navigate("/dashboard")}>
             Home
           </Button>
-          <Button className="bg-white text-black hover:bg-purple-800" onClick={() => navigate("/itenary")}>
+          <Button variant="ghost" onClick={() => navigate("/itinerary")}>
             Itinerary
           </Button>
-          <Button className="bg-red-600 hover:bg-red-700" onClick={handleLogout}>
+          <Button variant="ghost" onClick={handleSignOut}>
             Logout
           </Button>
         </div>
-      </nav>
+      </div>
 
-      {/* Chatbox Section */}
-      <div className="pt-32 px-6 max-w-3xl mx-auto">
-          <h1 className="text-4xl font-bold mb-4">Welcome to TravelBuddy AI Planner</h1>
-        <h2 className="text-xl font-bold mb-6 text-center">Ask your AI Travel Assistant</h2>
+      <h2 className="text-3xl font-bold text-center my-6">AI Destination Suggestions</h2>
 
-        <div className="flex gap-2 mb-6">
-          <Input
-            className="flex-grow"
-            placeholder="I want to explore mountains, beach, holy places..."
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handlePrompt()}
-          />
-          <Button onClick={handlePrompt}>Ask</Button>
-        </div>
+      <div className="max-w-xl mx-auto space-y-4">
+        <input
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-500 bg-gray-900 text-white rounded-md shadow-sm focus:outline-none"
+          placeholder="Enter Indian State (e.g., Uttarakhand, Kashmir)"
+        />
+        <Button onClick={handleGenerate} disabled={loading}>
+          {loading ? "Generating..." : "Get Suggestions"}
+        </Button>
+      </div>
 
-        <div className="space-y-4">
-          {responses.map((res, index) => (
-            <Card key={index} className="bg-white text-black">
-              <CardContent className="p-4">
-                <p><strong>You:</strong> {res.question}</p>
-                <p className="mt-2"><strong>AI:</strong> {res.answer}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+      <div className="mt-10 space-y-12 max-w-4xl mx-auto">
+        {responses.map((res, index) => (
+          <div key={index} className="space-y-6">
+            <h3 className="text-2xl font-semibold text-purple-400 mb-4">
+              State: {res?.answer?.state || "Unknown"}
+            </h3>
+
+            {(res?.answer?.cities || []).map((city, i) => (
+              <Card key={i} className="shadow-lg bg-gray-900 text-white border border-purple-500">
+                <CardContent className="p-6">
+                  <h4 className="text-xl font-bold text-purple-300 mb-2">{city.name}</h4>
+
+                  {city.spots?.length > 0 && (
+                    <div className="mb-3">
+                      <p className="font-semibold">📍 Places to Visit:</p>
+                      <ul className="list-disc list-inside text-sm text-gray-300">
+                        {city.spots.map((spot, idx) => (
+                          <li key={idx}>{spot}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {city.experiences?.length > 0 && (
+                    <div className="mb-3">
+                      <p className="font-semibold">🌟 Unique Experiences:</p>
+                      <ul className="list-disc list-inside text-sm text-gray-300">
+                        {city.experiences.map((exp, idx) => (
+                          <li key={idx}>{exp}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {city.seasonalTips?.length > 0 && (
+                    <div className="mb-3">
+                      <p className="font-semibold">❄️ Seasonal Tips:</p>
+                      <ul className="list-disc list-inside text-sm text-gray-300">
+                        {city.seasonalTips.map((tip, idx) => (
+                          <li key={idx}>{tip}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {city.localFoods?.length > 0 && (
+                    <div className="mb-3">
+                      <p className="font-semibold">🍲 Local Foods:</p>
+                      <ul className="list-disc list-inside text-sm text-gray-300">
+                        {city.localFoods.map((food, idx) => (
+                          <li key={idx}>{food}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {city.travelTips?.length > 0 && (
+                    <div className="mb-3">
+                      <p className="font-semibold">💡 Travel Tips:</p>
+                      <ul className="list-disc list-inside text-sm text-gray-300">
+                        {city.travelTips.map((tip, idx) => (
+                          <li key={idx}>{tip}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );
