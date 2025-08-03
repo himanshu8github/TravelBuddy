@@ -7,9 +7,25 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { getAuth, signOut } from "firebase/auth";
+import app from "../firebase.js";
+
 
 const Explore = () => {
   const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+    const auth = getAuth(app);
+
+   const handleLogout = async () => {
+      try {
+        await signOut(auth);
+        navigate("/");
+      } catch (error) {
+        console.error("Logout failed:", error);
+      }
+    };
 
   const filteredPlaces = placesData.filter((stateGroup) => {
     const matchState = stateGroup.state.toLowerCase().includes(query.toLowerCase());
@@ -21,6 +37,29 @@ const Explore = () => {
 
   return (
     <section className="pt-24 px-4 text-white bg-black min-h-screen">
+       <nav className="flex justify-between items-center px-6 py-4 bg-black shadow-md fixed top-0 w-full z-10">
+              <h1
+                className="text-3xl font-bold cursor-pointer"
+                onClick={() => navigate("/home")}
+              >
+                TravelBuddy
+              </h1>
+              <div className="space-x-4">
+                <Button
+                  className="bg-white text-black hover:bg-purple-800"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  Home
+                </Button>
+                <Button
+                  className="bg-red-600 hover:bg-red-700"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
+              </div>
+            </nav>
+      
       <h1 className="text-3xl font-bold text-center mb-8">Explore India</h1>
 
       <div className="max-w-md mx-auto mb-8">

@@ -7,34 +7,48 @@ dotenv.config();
 const router = express.Router();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-router.post("/generate-itinerary", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const { prompt } = req.body;
 
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const result = await model.generateContent(
-      `Give me a travel guide for the Indian state "${prompt}" in structured JSON. Include:
-- 3 to 5 most famous cities to visit in that state.
+
+
+const result = await model.generateContent(
+`You are a travel expert assistant. Given an Indian state name, return a travel guide strictly in **valid JSON format**. Do not return markdown, text, or explanations. Your response MUST start with a JSON object that includes a top-level "state" key.
+
+Instructions:
+- Include 5 to 8 famous cities to visit in the given Indian state.
 - For each city, include:
   - Top places/spots to visit
-  - Unique experiences to try
-  - Seasonal tips (like snowfall, avoid monsoon, etc.)
+  - Unique experiences
+  - Seasonal tips
+  - Local foods
+  - Travel tips
 
-Return response in this JSON format only:
+Input State: "${prompt}"
 
+Return JSON like:
 {
   "state": "${prompt}",
   "cities": [
     {
-      "name": "",
-      "spots": [],
-      "experiences": [],
-      "seasonalTips": []
+      "name": "City Name",
+      "spots": ["spot1", "spot2"],
+      "experiences": ["exp1", "exp2"],
+      "seasonalTips": ["tip1"],
+      "localFoods": ["food1"],
+      "travelTips": ["tip1"]
     }
   ]
-}`
-    );
+}
+
+IMPORTANT: Only return raw JSON (no markdown/code blocks).`
+);
+
+
+    
 
     const response = result.response;
     const text = response.text();
@@ -42,6 +56,10 @@ Return response in this JSON format only:
     // Clean response text and parse
     const cleanedText = text.replace(/```json|```/g, "").trim();
     const json = JSON.parse(cleanedText);
+    console.log("Raw Gemini Response:\n", text);
+console.log("Cleaned JSON:\n", cleanedText);
+console.log("Parsed JSON:\n", json);
+
 
     res.status(200).json({ success: true, answer: json });
   } catch (error) {

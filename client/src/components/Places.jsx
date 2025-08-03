@@ -1,6 +1,5 @@
 import React from "react";
 import places from "../data/places";
-import PlaceCard from "./PlaceCard"; // you can customize this
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -28,8 +27,8 @@ const PlacesComponent = () => {
         ))}
       </div>
 
-      <div className="text-center mt-10">
-        <Button onClick={() => navigate("/explore")} className="bg-purple-700 hover:bg-purple-800 text-white">
+      <div className="text-center mt-8">
+        <Button onClick={() => navigate("/signup")} className="bg-purple-700 hover:bg-purple-800 text-white">
           Explore More
         </Button>
       </div>

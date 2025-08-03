@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { getAuth, signOut } from "firebase/auth";
 import app from "../firebase.js"; // adjust path if needed
 
@@ -13,12 +13,13 @@ const AiPlanner = () => {
   const navigate = useNavigate();
   const auth = getAuth(app);
 
-  const handleSignOut = async () => {
+
+ const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigate("/login");
+      navigate("/");
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error("Logout failed:", error);
     }
   };
 
@@ -26,10 +27,10 @@ const AiPlanner = () => {
     if (!prompt) return;
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/generate-itinerary", {
+      const res = await axios.post("http://localhost:5000/api/chat-suggestions", {
         prompt,
       });
-      setResponses([...responses, res.data]);
+      setResponses([ res.data]);
     } catch (err) {
       console.error(err);
       alert("Error generating itinerary");
@@ -40,22 +41,27 @@ const AiPlanner = () => {
   return (
     <div className="min-h-screen bg-black text-white px-4 pb-20">
       {/* Custom Navbar */}
-      <div className="flex justify-between items-center px-6 py-4 border-b border-gray-700 bg-black shadow-md sticky top-0 z-50">
-        <h1 className="text-xl font-bold text-white">TravelBuddy</h1>
-        <div className="space-x-4">
-          <Button variant="ghost" onClick={() => navigate("/dashboard")}>
+      <div className="flex justify-between items-center px-6 py-4 bg-black shadow-md sticky top-0 z-50">
+        <h1 className="text-3xl font-bold text-white">TravelBuddy</h1>
+        <div className="space-x-4 text-2xl font-bold">
+          <Button variant="ghost" className="text-xl " onClick={() => navigate("/dashboard")}>
             Home
           </Button>
-          <Button variant="ghost" onClick={() => navigate("/itinerary")}>
-            Itinerary
-          </Button>
-          <Button variant="ghost" onClick={handleSignOut}>
+        <Link to="/itenary">
+  <Button variant="ghost" className="text-xl">Itinerary</Button>
+</Link>
+          <Button className="bg-red-600 text-white" onClick={handleLogout}>
             Logout
+
           </Button>
         </div>
       </div>
 
-      <h2 className="text-3xl font-bold text-center my-6">AI Destination Suggestions</h2>
+
+
+
+          <h1 className="text-3xl font-bold text-center my-6">Welcome to TravelBuddy</h1>
+      <h2 className="text-2xl font-bold text-center my-6">AI Destination Suggestions</h2>
 
       <div className="max-w-xl mx-auto space-y-4">
         <input
@@ -64,7 +70,7 @@ const AiPlanner = () => {
           className="w-full px-4 py-2 border border-gray-500 bg-gray-900 text-white rounded-md shadow-sm focus:outline-none"
           placeholder="Enter Indian State (e.g., Uttarakhand, Kashmir)"
         />
-        <Button onClick={handleGenerate} disabled={loading}>
+        <Button  className ="flex item-center " onClick={handleGenerate} disabled={loading}>
           {loading ? "Generating..." : "Get Suggestions"}
         </Button>
       </div>

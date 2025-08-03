@@ -52,6 +52,9 @@ const ItineraryPlanner = () => {
       <nav className="bg-black px-6 py-4 shadow-md flex justify-between items-center">
         <h1 className="text-3xl font-bold text-white">TravelBuddy</h1>
         <div className="space-x-6">
+            <Button variant="ghost" onClick={() => navigate("/dashboard")}>
+                      Home
+                    </Button>
           <Link to='/aiplanner' className="text-white hover:text-purple-300 text-lg">AI Planner</Link>
           <Button onClick={handleLogout} className="bg-red-700 hover:bg-red-800 text-white px-4">Logout</Button>
         </div>

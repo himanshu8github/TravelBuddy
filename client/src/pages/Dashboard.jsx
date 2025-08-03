@@ -35,7 +35,7 @@ const Dashboard = () => {
   };
 
   const logout = () => {
-    navigate('/home');
+    navigate('/login');
   };
 
   const cards = [
@@ -86,7 +86,7 @@ const Dashboard = () => {
             <span className="text-white">Profile</span>
             <FaChevronDown className="text-black" />
            <span
-  className="text-white cursor-pointer hover:underline"
+  className="text-white cursor-pointer"
   onClick={() => {
     const section = document.getElementById('contact-section');
     if (section) {

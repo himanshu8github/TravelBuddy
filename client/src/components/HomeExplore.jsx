@@ -46,7 +46,7 @@ const HomeExplore = () => {
 
       <div className="text-center mt-10">
         <button
-          onClick={() => navigate("/explore")}
+          onClick={() => navigate("/signup")}
           className="px-6 py-2 bg-purple-700 hover:bg-purple-800 rounded text-white"
         >
           Explore More
