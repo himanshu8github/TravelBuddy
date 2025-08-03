@@ -9,8 +9,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 👇 This mounts the route at /api/generate-itinerary
-app.use("/api/generate-itinerary", geminiRoute);
+//  This mounts the route at /api/generate-itinerary
+app.use("/api", geminiRoute);
 
 app.get("/", (req, res) => {
   res.send("API is running...");
