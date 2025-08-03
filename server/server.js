@@ -10,13 +10,16 @@ dotenv.config();
 
 const app = express();
 app.use(cors());
+
+
+app.use("/api/stripe", webhookRoute);
 app.use(express.json());
 
 //  This mounts the route at /api/generate-itinerary
 app.use("/api", geminiRoute);
 app.use("/api/chat-suggestions", chatbotRoute);
 app.use("/api/payment", paymentRoute);
-app.use("/api/stripe", webhookRoute);
+
 
 app.get("/", (req, res) => {
   res.send("API is running...");

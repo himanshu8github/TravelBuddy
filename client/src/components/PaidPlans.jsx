@@ -25,6 +25,7 @@ const plans = [
 const PaidPlans = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
+  const auth = getAuth();
 
   
    const handleLogout = async () => {
@@ -38,7 +39,7 @@ const PaidPlans = () => {
 
  const handleBuyNow = (planTitle) => {
   if (user) {
-    navigate("/payment", { state: { plan: planTitle } });
+  navigate("/payment", { state: { plan: planTitle } });
   } else {
     navigate("/signup");
   }
@@ -46,7 +47,7 @@ const PaidPlans = () => {
 
 
   return (
-    <div  className="bg-black text-white min-h-screen">
+    <div  className="bg-black text-white min-h-screen pt-28">
         {/*navbar*/}
          <div className="fixed top-0  w-full bg-black shadow-md z-0">
                 <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">

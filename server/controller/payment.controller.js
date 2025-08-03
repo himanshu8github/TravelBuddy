@@ -2,11 +2,18 @@ import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const createCheckoutSession = async (req, res) => {
-  const { plan } = req.body;
+  const { plan, email } = req.body;
+
+  if (!plan || !email) {
+    return res.status(400).json({ error: "Plan and email are required" });
+  }
+
+  const formatPlan = (p) => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase();
+  const normalizedPlan = formatPlan(plan);
 
   let priceId;
 
-  switch (plan) {
+  switch (normalizedPlan) {
     case "Basic":
       priceId = process.env.BASIC_PLAN_PRICE_ID;
       break;
@@ -30,6 +37,7 @@ const createCheckoutSession = async (req, res) => {
         },
       ],
       mode: "subscription",
+      customer_email: req.body.email,
       success_url: "http://localhost:5173/success",
       cancel_url: "http://localhost:5173/cancel",
     });

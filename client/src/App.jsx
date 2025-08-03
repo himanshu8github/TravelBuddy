@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import Itenary from "./pages/Itenary";
 import AiPlanner from "./pages/AiPlanner";
 import History from './pages/History';
+import PaidPlans from "./components/PaidPlans";
 import ExpenseTracker from "./pages/ExpenseTracker";
 import Payment from "./pages/Payment"
 import Success from "./pages/Success";
@@ -25,6 +26,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
         <Route path="/destination/:id" element={<Destination />} />
            <Route path="/dashboard" element={<Dashboard />} />
+                   <Route path="/paidplans" element={<PaidPlans />} />
            <Route path="/itenary" element={<Itenary />} />
             <Route path="/aiplanner" element={<AiPlanner />} />
             <Route path="/paiduser" element={<Payment />} />
