@@ -1,211 +1,150 @@
-import React, { useState } from "react";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
+import React, { useState } from 'react';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const ItineraryPlanner = () => {
-  const [formData, setFormData] = useState({
-    destination: "",
-    from: "",
-    to: "",
-    people: 1,
-    group: "friends",
-    budget: "moderate",
+  const [form, setForm] = useState({
+    destination: '',
+    days: '',
+    groupType: '',
+    budget: '',
   });
-
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const calculateDays = () => {
-    const start = new Date(formData.from);
-    const end = new Date(formData.to);
-    const diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-    return diff > 0 ? diff : 1;
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async () => {
-    if (!formData.destination || !formData.from || !formData.to) {
-      alert("Please fill in all fields.");
-      return;
-    }
-
-    const days = calculateDays();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setLoading(true);
-    setResult("");
-
     try {
-      const res = await fetch("http://localhost:5000/api/generate-itinerary", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          destination: formData.destination,
-          days,
-          groupType: formData.group,
-          budget: formData.budget,
-        }),
-      });
-
-      const data = await res.json();
-      if (data && data.itinerary) {
-       setResult(data);
-      } else {
-        setResult("No itinerary generated. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error generating itinerary:", error);
-      setResult("Error generating itinerary.");
+      const res = await axios.post('http://localhost:5000/api/generate-itinerary', form);
+      setResult(res.data);
+    } catch (err) {
+      console.error('API Error:', err);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleConfirm = () => {
+    // Logic to save to MongoDB can be written here
+    console.log("Confirmed! Save this plan to DB.");
+  };
+
   return (
-    <section className="p-6 bg-black min-h-screen text-black">
-      <Card className="bg-white text-black mb-8">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">Plan Your Trip</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium">Where do you want to go?</label>
-            <Input
-              placeholder="Destination"
-              value={formData.destination}
-              onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
-            />
-          </div>
+    <div className="min-h-screen bg-black text-white">
+      {/* Navbar */}
+      <div className="bg-black p-4 shadow-md flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-white">TravelBuddy</h1>
+        <div className="space-x-4">
+          <Link to='/aiplanner' className="text-white u">AI Planner</Link>
+          <Button className="bg-red-700 hover:bg-red-800 text-white">Logout</Button>
+        </div>
+      </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium">From</label>
-              <Input
-                type="date"
-                value={formData.from}
-                onChange={(e) => setFormData({ ...formData, from: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium">To</label>
-              <Input
-                type="date"
-                value={formData.to}
-                onChange={(e) => setFormData({ ...formData, to: e.target.value })}
-              />
-            </div>
-          </div>
+      <div className="p-6 max-w-5xl mx-auto">
+        <h1 className='font-bold text-4xl text-center mb-2'>Welcome to TravelBuddy</h1>
+        <h3 className='font-bold text-xl text-center mb-8'>Start planning your trip with us!</h3>
 
-          <div>
-            <label className="block text-sm font-medium">No. of People</label>
-            <Input
-              type="number"
-              min={1}
-              placeholder="Number of People"
-              value={formData.people}
-              onChange={(e) => setFormData({ ...formData, people: e.target.value })}
-            />
-          </div>
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="bg-white text-black rounded-lg shadow-md p-6 grid gap-4 grid-cols-1 md:grid-cols-2">
+          <h2 className="col-span-full text-xl font-semibold text-gray-800">✈️ Trip Details</h2>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium">Group Type</label>
-              <select
-                value={formData.group}
-                onChange={(e) => setFormData({ ...formData, group: e.target.value })}
-                className="bg-zinc-100 text-black rounded p-2 w-full"
-              >
-                <option value="solo">Solo</option>
-                <option value="friends">Friends</option>
-                <option value="family">Family</option>
-                <option value="couple">Couple</option>
-              </select>
-            </div>
+          <input type="text" name="destination" placeholder="Destination (e.g. Rishikesh)" onChange={handleChange} className="border p-2 rounded" required />
+          <input type="number" name="days" placeholder="Number of Days" onChange={handleChange} className="border p-2 rounded" required />
+          
+          <select name="groupType" onChange={handleChange} className="border p-2 rounded" required>
+            <option value="">Group Type</option>
+            <option value="friends">Friends</option>
+            <option value="family">Family</option>
+            <option value="couple">Couple</option>
+            <option value="solo">Solo</option>
+          </select>
 
-            <div>
-              <label className="block text-sm font-medium">Budget</label>
-              <select
-                value={formData.budget}
-                onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                className="bg-zinc-100 text-black rounded p-2 w-full"
-              >
-                <option value="cheap">Cheap</option>
-                <option value="moderate">Moderate</option>
-                <option value="luxury">Luxury</option>
-              </select>
-            </div>
-          </div>
+          <select name="budget" onChange={handleChange} className="border p-2 rounded" required>
+            <option value="">Budget</option>
+            <option value="cheap">Cheap</option>
+            <option value="moderate">Moderate</option>
+            <option value="luxury">Luxury</option>
+          </select>
 
-          <Button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="w-full bg-purple-700 hover:bg-purple-800"
-          >
+          <button type="submit" className="col-span-full bg-black hover:bg-gray-900 text-white py-2 rounded mt-2">
             {loading ? "Generating..." : "Generate Itinerary"}
-          </Button>
-        </CardContent>
-      </Card>
+          </button>
+        </form>
 
-      
-   {result && (
-  <div className="space-y-6">
-    {/* Hostels Section */}
-    <Card className="bg-white text-black">
-      <CardHeader>
-        <CardTitle className="text-xl">Recommended Stays</CardTitle>
-      </CardHeader>
-      <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {result.hostels?.map((hostel, index) => (
-          <Card key={index} className="border border-gray-300">
-            <img src={hostel.imageUrl} alt={hostel.name} className="w-full h-40 object-cover rounded-t" />
-            <CardContent className="p-3">
-              <h3 className="text-lg font-semibold">{hostel.name}</h3>
-              <p className="text-sm text-gray-600">{hostel.address}</p>
-              <p>₹{hostel.pricePerNight} / night</p>
-              <p className="text-sm">Rating: {hostel.rating} ⭐</p>
-              <p className="text-xs mt-1">{hostel.description}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </CardContent>
-    </Card>
+        {/* Output Cards */}
+        {result && (
+          <div className="mt-12 space-y-10">
 
-    {/* Itinerary Section */}
-    <Card className="bg-white text-black">
-      <CardHeader>
-        <CardTitle className="text-xl">Itinerary</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {result.itinerary?.map((day, index) => (
-          <Card key={index} className="border border-purple-200 bg-purple-50">
-            <CardHeader>
-              <CardTitle>Day {index + 1}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {day.activities?.map((activity, idx) => (
-                <div key={idx} className="flex gap-4">
-                  <img
-                    src={activity.imageUrl}
-                    alt={activity.placeName}
-                    className="w-24 h-24 rounded object-cover"
-                  />
-                  <div>
-                    <h4 className="font-semibold">{activity.placeName}</h4>
-                    <p className="text-sm">{activity.details}</p>
-                    <p className="text-xs text-gray-500">
-                      🎟️ ₹{activity.ticketPrice} | ⏱️ {activity.travelTime}
-                    </p>
+            {/* Stays */}
+            <div>
+              <h2 className="text-2xl font-bold mb-4 text-white">🏨 Suggested Stays</h2>
+              <div className="grid gap-6 md:grid-cols-2">
+                {result.hostels?.map((hostel, idx) => (
+                  <div key={idx} className="bg-white text-black p-4 rounded-lg shadow">
+                    <h3 className="font-semibold text-lg">{hostel.name}</h3>
+                    <p className="text-sm">{hostel.location}</p>
+                    <p className="mt-1">💵 <strong>{hostel.pricePerNight}</strong> per night</p>
+                    <p className="mt-1">⭐ {hostel.rating}</p>
+                    <p className="mt-2 text-sm">{hostel.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Restaurants */}
+            <div>
+              <h2 className="text-2xl font-bold mb-4 text-white">🍽️ Recommended Restaurants</h2>
+              <div className="grid gap-6 md:grid-cols-2">
+                {result.restaurants?.map((restro, idx) => (
+                  <div key={idx} className="bg-white text-black p-4 rounded-lg shadow">
+                    <h3 className="font-semibold text-lg">{restro.name}</h3>
+                    <p className="text-sm">{restro.location}</p>
+                    <p className="mt-1">🍛 Cuisine: {restro.cuisine}</p>
+                    <p className="mt-1">💵 Avg. Food Price: {restro.avgPrice}</p>
+                    <p className="mt-1">⭐ {restro.rating}</p>
+                    <p className="mt-2 text-sm">{restro.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Day-wise Itinerary */}
+            <div>
+              <h2 className="text-2xl font-bold mb-4 text-white">🗓️ Day-wise Itinerary</h2>
+              {result.itinerary?.map((dayPlan, dayIdx) => (
+                <div key={dayIdx} className="bg-white text-black rounded-lg shadow p-4 mb-6">
+                  <h3 className="text-lg font-semibold mb-2">Day {dayPlan.day}</h3>
+                  <div className="space-y-2">
+                    {dayPlan.activities?.map((act, actIdx) => (
+                      <div key={actIdx} className="border border-gray-300 p-3 rounded bg-gray-50">
+                        <p className="font-semibold">{act.placeName}</p>
+                        <p className="text-sm">{act.details}</p>
+                        <p className="text-sm">🕒 Travel Time: {act.travelTime}</p>
+                        <p className="text-sm">🎟️ Ticket Price: {act.ticketPrice}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}
-            </CardContent>
-          </Card>
-        ))}
-      </CardContent>
-    </Card>
-  </div>
-)}
+            </div>
 
-    </section>
+            {/* Confirm Button */}
+            <div className="flex justify-center mt-8">
+              <button onClick={handleConfirm} className="bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded text-lg">
+                ✅ Confirm This Plan
+              </button>
+            </div>
+
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
