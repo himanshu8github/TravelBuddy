@@ -17,6 +17,12 @@ const app = initializeApp(firebaseConfig);
 export const provider = new GoogleAuthProvider();
 export const db = getFirestore(app);
 export const auth = getAuth(app);
-export const analytics = getAnalytics(app); 
 
+let analytics = null;
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  analytics = getAnalytics(app);
+}
+
+
+export { analytics };
 export default app;
