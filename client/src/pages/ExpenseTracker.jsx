@@ -63,7 +63,10 @@ const ExpenseTracker = () => {
     if (!name || !amount || !type) return;
 
     const user = auth.currentUser;
-    if (!user) return;
+     if (!user) {
+    console.error("User not logged in");
+    return;
+  }
 
     const newExpense = {
       uid: user.uid,
@@ -82,6 +85,8 @@ const ExpenseTracker = () => {
       setDescription("");
       setType("added");
       setTrip("");
+      
+
     } catch (error) {
       console.error("Error adding expense:", error);
     }
