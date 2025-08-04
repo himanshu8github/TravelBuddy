@@ -1,5 +1,5 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth, provider, analytics } from "../firebase";
+import { auth, provider, getAnalytics } from "../firebase";
 import { logEvent } from "firebase/analytics";
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
@@ -12,7 +12,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
- const analytics = getAnalytics();
+
 
   const handleGoogleLogin = async () => {
     if (loading) return;

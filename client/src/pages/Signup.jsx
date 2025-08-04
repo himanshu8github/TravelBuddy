@@ -15,7 +15,6 @@ const Signup = () => {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false); 
 
-  const analytics = getAnalytics();
 
   const handleGoogleSignup = async () => {
     if (loading) return;
