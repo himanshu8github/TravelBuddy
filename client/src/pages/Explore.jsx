@@ -36,29 +36,35 @@ const Explore = () => {
   });
 
   return (
-    <section className="pt-24 px-4 text-white bg-black min-h-screen">
-       <nav className="flex justify-between items-center px-6 py-4 bg-black shadow-md fixed top-0 w-full z-10">
-              <h1
-                className="text-3xl font-bold cursor-pointer"
-                onClick={() => navigate("/home")}
-              >
-                TravelBuddy
-              </h1>
-              <div className="space-x-4">
-                <Button
-                  className="bg-white text-black hover:bg-purple-800"
-                  onClick={() => navigate("/dashboard")}
-                >
-                  Home
-                </Button>
-                <Button
-                  className="bg-red-600 hover:bg-red-700"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </Button>
-              </div>
-            </nav>
+    <section className="pt-[120px] px-4 text-white bg-black min-h-screen">
+      <nav className="bg-black shadow-md fixed top-0 w-full z-10 px-6 py-4">
+  <div className="flex flex-col items-center justify-center space-y-4 md:flex-row md:justify-between md:items-center md:space-y-0">
+   
+    <h1
+      className="text-3xl font-bold cursor-pointer text-white md:self-start"
+      onClick={() => navigate("/home")}
+    >
+      TravelBuddy
+    </h1>
+
+   
+    <div className="flex space-x-4 md:self-end">
+      <Button
+        className="bg-white text-black hover:bg-purple-800"
+        onClick={() => navigate("/dashboard")}
+      >
+        Home
+      </Button>
+      <Button
+        className="bg-red-600 hover:bg-red-700"
+        onClick={handleLogout}
+      >
+        Logout
+      </Button>
+    </div>
+  </div>
+</nav>
+
       
       <h1 className="text-3xl font-bold text-center mb-8">Explore India</h1>
 

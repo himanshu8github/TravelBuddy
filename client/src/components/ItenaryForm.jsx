@@ -61,8 +61,8 @@ const ItineraryPlanner = () => {
       Home
     </Button>
 
-    <Link to="/itenary">
-      <Button variant="ghost" className="text-xl">Itinerary</Button>
+    <Link to="/aiplanner">
+      <Button variant="ghost" className="text-xl">AiPlanner</Button>
     </Link>
 
     <Button className="bg-red-600 text-white" onClick={handleLogout}>
