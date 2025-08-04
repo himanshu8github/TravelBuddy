@@ -17,7 +17,8 @@ app.use(
   })
 );
 
-app.use("/api/stripe", bodyParser.raw({ type: "application/json" }), Webhookstripe);
+
+app.use("/api/stripe", Webhookstripe);
 
 
 app.use(express.json());
