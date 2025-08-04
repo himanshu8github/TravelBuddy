@@ -10,88 +10,87 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 router.post("/", async (req, res) => {
   try {
     const { prompt } = req.body;
+    if (!prompt || typeof prompt !== "string") {
+      return res.status(400).json({ success: false, message: "Invalid input." });
+    }
+
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    //  Validate prompt
-    const validationResponse = await model.generateContent(
-      `You are an assistant that validates user input for an Indian travel guide app.
+    const generationConfig = {
+      maxOutputTokens: 1024,
+      temperature: 0.7,
+    };
 
-      
-Respond ONLY with the single word "true" or "false" (without quotes) — nothing else.
-Examples:
-Input: "Mumbai"
-Output: true
+   
+    const validationPrompt = `Respond only with "true" or "false": Is "${prompt}" a valid Indian travel destination?`;
 
-Input: "Hello"
-Output: false
-
-Input: "Uttarakhand"
-Output: true
-
-Input: "random text"
-Output: false
-// Respond ONLY with:
-// - "true" if the input is a valid Indian state, city, or tourist destination.
-// - "false" if it is not (e.g. 'hi', 'hello', 'random', etc.).
-
-Input: "${prompt}"`
-    );
+    const validationResponse = await model.generateContent({
+      contents: [{ role: "user", parts: [validationPrompt] }],
+      generationConfig,
+    });
 
     const isValid = validationResponse.response.text().trim().toLowerCase();
-    
-console.log("Validation response:", isValid);
+    console.log("Validation:", isValid);
 
-    if (!isValid.includes("true")) {
+    if (isValid !== "true") {
       return res.status(400).json({
         success: false,
-        message: "Please enter a valid Indian state, city, or destination name.",
+        message: "Please enter a valid Indian state, city, or destination.",
       });
     }
 
-    //  Generate travel guide
-    const travelGuideResponse = await model.generateContent(
-      `You are a travel expert assistant. Given an Indian state or city name, return a travel guide strictly in valid JSON format. Do not return markdown, text, or explanations. Your response MUST start with a JSON object that includes a top-level "state" key.
+  
+    const travelGuidePrompt = `
+You are a travel assistant. Given the Indian state or city: "${prompt}", return a travel guide in JSON format.
 
-Instructions:
-- Include 5 to 8 famous cities to visit in the given Indian state.
-- For each city, include:
-  - Top places/spots to visit
-  - Unique experiences
-  - Seasonal tips
-  - Local foods
-  - Travel tips
+Include 3-5 cities. For each city, include:
+- spots
+- experiences
+- seasonalTips
+- localFoods
+- travelTips
 
-Input State: "${prompt}"
-
-Return JSON like:
+Respond only with JSON like:
 {
   "state": "${prompt}",
   "cities": [
     {
-      "name": "City Name",
-      "spots": ["spot1", "spot2"],
-      "experiences": ["exp1", "exp2"],
-      "seasonalTips": ["tip1"],
-      "localFoods": ["food1"],
-      "travelTips": ["tip1"]
+      "name": "",
+      "spots": [],
+      "experiences": [],
+      "seasonalTips": [],
+      "localFoods": [],
+      "travelTips": []
     }
   ]
 }
+`;
 
-IMPORTANT: Only return raw JSON (no markdown/code blocks).`
-    );
+    const travelGuideResponse = await model.generateContent({
+      contents: [{ role: "user", parts: [travelGuidePrompt] }],
+      generationConfig,
+    });
 
-    const text = travelGuideResponse.response.text();
-    const cleanedText = text.replace(/```json|```/g, "").trim();
-    const json = JSON.parse(cleanedText);
+    const rawText = travelGuideResponse.response.text().trim();
+    const cleanedText = rawText.replace(/```json|```/g, "").trim();
 
-    console.log("Raw Gemini Response:\n", text);
-    console.log("Cleaned JSON:\n", cleanedText);
-    console.log("Parsed JSON:\n", json);
+    let json;
+    try {
+      json = JSON.parse(cleanedText);
+    } catch (parseErr) {
+      console.error(" JSON Parse Error:", parseErr);
+      return res.status(500).json({
+        success: false,
+        message: "AI response was not valid JSON.",
+        debug: cleanedText,
+      });
+    }
 
+    console.log(" Travel Guide JSON Parsed");
     res.status(200).json({ success: true, answer: json });
+
   } catch (error) {
-    console.error("Gemini API error:", error);
+    console.error(" Gemini API error:", error);
     res.status(500).json({
       success: false,
       message: "Something went wrong",
