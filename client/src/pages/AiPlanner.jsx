@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate, Link } from "react-router-dom";
 import { getAuth, signOut } from "firebase/auth";
-import app from "../firebase.js";
+import { app } from "../firebase";
 import { Toaster, toast } from "sonner";
 
 const AiPlanner = () => {
