@@ -1,5 +1,6 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth, provider, analytics } from "../firebase";
+import { logEvent } from "firebase/analytics";
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +12,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
- 
+ const analytics = getAnalytics();
 
   const handleGoogleLogin = async () => {
     if (loading) return;
@@ -21,6 +22,11 @@ const Login = () => {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       console.log("User logged in:", result.user);
+
+         logEvent(analytics, 'login_with_google', {
+      uid: result.user.uid,
+      email: result.user.email
+    });
 
       useAuthStore.getState().setUser({
   uid: result.user.uid,
