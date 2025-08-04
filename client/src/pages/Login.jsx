@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Nav from "../components/Nav";
 import useAuthStore from "../store/authstore";
-import { logEvent } from "firebase/analytics";
+
 
 const Login = () => {
   const navigate = useNavigate();
