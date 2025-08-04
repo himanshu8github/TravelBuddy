@@ -26,11 +26,11 @@ const Signup = () => {
       console.log("User signed up:", result.user);
 
    if (analytics) {
-      logEvent(analytics, "sign_up", {
-        method: "google",
-        email: user.email,
-        uid: user.uid,
-      });
+     logEvent(analytics, "sign_up", {
+  method: "google",
+  email: result.user.email,
+  uid: result.user.uid,
+});
     }
       useAuthStore.getState().setUser({
   uid: result.user.uid,
