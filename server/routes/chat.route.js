@@ -7,7 +7,7 @@ dotenv.config();
 const router = express.Router();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-router.post("/", async (req, res) => {
+router.post("/chat-suggestions", async (req, res) => {
   try {
     const { prompt } = req.body;
     if (!prompt || typeof prompt !== "string") {
