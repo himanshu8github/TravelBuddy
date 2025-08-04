@@ -10,13 +10,47 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 router.post("/", async (req, res) => {
   try {
     const { prompt } = req.body;
-
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
+    //  Validate prompt
+    const validationResponse = await model.generateContent(
+      `You are an assistant that validates user input for an Indian travel guide app.
 
+      
+Respond ONLY with the single word "true" or "false" (without quotes) — nothing else.
+Examples:
+Input: "Mumbai"
+Output: true
 
-const result = await model.generateContent(
-`You are a travel expert assistant. Given an Indian state name, return a travel guide strictly in **valid JSON format**. Do not return markdown, text, or explanations. Your response MUST start with a JSON object that includes a top-level "state" key.
+Input: "Hello"
+Output: false
+
+Input: "Uttarakhand"
+Output: true
+
+Input: "random text"
+Output: false
+// Respond ONLY with:
+// - "true" if the input is a valid Indian state, city, or tourist destination.
+// - "false" if it is not (e.g. 'hi', 'hello', 'random', etc.).
+
+Input: "${prompt}"`
+    );
+
+    const isValid = validationResponse.response.text().trim().toLowerCase();
+    
+console.log("Validation response:", isValid);
+
+    if (!isValid.includes("true")) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid Indian state, city, or destination name.",
+      });
+    }
+
+    //  Generate travel guide
+    const travelGuideResponse = await model.generateContent(
+      `You are a travel expert assistant. Given an Indian state or city name, return a travel guide strictly in valid JSON format. Do not return markdown, text, or explanations. Your response MUST start with a JSON object that includes a top-level "state" key.
 
 Instructions:
 - Include 5 to 8 famous cities to visit in the given Indian state.
@@ -45,26 +79,24 @@ Return JSON like:
 }
 
 IMPORTANT: Only return raw JSON (no markdown/code blocks).`
-);
+    );
 
-
-    
-
-    const response = result.response;
-    const text = response.text();
-
-    // Clean response text and parse
+    const text = travelGuideResponse.response.text();
     const cleanedText = text.replace(/```json|```/g, "").trim();
     const json = JSON.parse(cleanedText);
-    console.log("Raw Gemini Response:\n", text);
-console.log("Cleaned JSON:\n", cleanedText);
-console.log("Parsed JSON:\n", json);
 
+    console.log("Raw Gemini Response:\n", text);
+    console.log("Cleaned JSON:\n", cleanedText);
+    console.log("Parsed JSON:\n", json);
 
     res.status(200).json({ success: true, answer: json });
   } catch (error) {
     console.error("Gemini API error:", error);
-    res.status(500).json({ success: false, message: "Something went wrong", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+      error: error.message,
+    });
   }
 });
 

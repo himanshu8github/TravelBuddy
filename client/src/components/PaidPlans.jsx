@@ -48,23 +48,28 @@ const PaidPlans = () => {
 
   return (
     <div  className="bg-black text-white min-h-screen pt-28">
-        {/*navbar*/}
-         <div className="fixed top-0  w-full bg-black shadow-md z-0">
-                <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-white">TravelBuddy</h1>
-                <div className="space-x-4 text-2xl font-bold">
-                  <Button variant="ghost" className="text-xl " onClick={() => navigate("/dashboard")}>
-                    Home
-                  </Button>
-               
+       {/* Navbar */}
+<div className="fixed top-0 w-full bg-black shadow-md z-50">
+  <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
+    
+    {/* Logo */}
+    <div className="text-center sm:text-left">
+      <h1 className="text-3xl font-bold text-white">TravelBuddy</h1>
+    </div>
 
-                  <Button className="bg-red-600 text-white " onClick={handleLogout}>
-                    Logout
-        
-                  </Button>
-                </div>
-              </div>
-              </div>
+    {/* Buttons */}
+    <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-end gap-3 text-xl font-bold">
+      <Button variant="ghost" className="text-xl" onClick={() => navigate("/dashboard")}>
+        Home
+      </Button>
+
+      <Button className="bg-red-600 text-white" onClick={handleLogout}>
+        Logout
+      </Button>
+    </div>
+  </div>
+</div>
+
         
       <h2 className="text-4xl font-bold text-center mb-10">Choose Your Plan</h2>
 

@@ -9,14 +9,17 @@ import { useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { serverTimestamp } from "firebase/firestore";
 import { auth, db } from "@/firebase";
+import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { collection, addDoc, onSnapshot, query, where, orderBy,} from "firebase/firestore";
 
 const ExpenseTracker = () => {
   const navigate = useNavigate();
 
+
   const [expenses, setExpenses] = useState([]);
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
+  const [trip, setTrip] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState("added");
 
@@ -71,6 +74,7 @@ const ExpenseTracker = () => {
       amount: parseFloat(amount),
       description,
       type,
+        trip,
        createdAt: serverTimestamp(),
     };
 
@@ -86,6 +90,30 @@ const ExpenseTracker = () => {
   }
 };
 
+const handleDelete = async (id) => {
+  try {
+    await deleteDoc(doc(db, "expenses", id));
+  } catch (error) {
+    console.error("Error deleting expense:", error);
+  }
+};
+
+const handleUpdate = async (id, updatedData) => {
+  try {
+    const expenseRef = doc(db, "expenses", id);
+    await updateDoc(expenseRef, updatedData);
+
+    // Update state immediately
+    setExpenses((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, ...updatedData } : e))
+    );
+  } catch (error) {
+    console.error("Error updating expense:", error);
+  }
+};
+
+
+
 
   const totalAdded = expenses
     .filter((e) => e.type === "added")
@@ -95,31 +123,41 @@ const ExpenseTracker = () => {
     .filter((e) => e.type === "spent")
     .reduce((acc, curr) => acc + curr.amount, 0);
 
+const trips = [...new Set(expenses.map((e) => e.trip).filter(Boolean))];
+
+
   return (
     <div className="bg-black text-white min-h-screen pb-20">
       {/* Navbar */}
-      <nav className="flex justify-between items-center px-6 py-4 bg-black shadow-md fixed top-0 w-full z-10">
-        <h1
-          className="text-3xl font-bold cursor-pointer"
-          onClick={() => navigate("/home")}
-        >
-          TravelBuddy
-        </h1>
-        <div className="space-x-4">
-          <Button
-            className="bg-white text-black hover:bg-purple-800"
-            onClick={() => navigate("/dashboard")}
-          >
-            Home
-          </Button>
-          <Button
-            className="bg-red-600 hover:bg-red-700"
-            onClick={handleLogout}
-          >
-            Logout
-          </Button>
-        </div>
-      </nav>
+     <nav className="w-full bg-black text-white shadow-md fixed top-0 z-50 px-6 py-4">
+  <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+    
+    {/* Logo */}
+    <h1
+      className="text-3xl font-bold cursor-pointer"
+      onClick={() => navigate("/home")}
+    >
+      TravelBuddy
+    </h1>
+
+    {/* Buttons */}
+    <div className="flex gap-4">
+      <Button
+        className="bg-white text-black hover:bg-purple-800"
+        onClick={() => navigate("/dashboard")}
+      >
+        Home
+      </Button>
+      <Button
+        className="bg-red-600 hover:bg-red-700"
+        onClick={handleLogout}
+      >
+        Logout
+      </Button>
+    </div>
+
+  </div>
+</nav>
 
       {/* Content */}
       <div className="pt-32 px-6 max-w-5xl mx-auto space-y-6">
@@ -167,6 +205,16 @@ const ExpenseTracker = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            <div>
+  <Label>Trip</Label>
+  <Input
+    placeholder="Enter trip name (e.g., Goa, Manali)"
+    value={trip}
+    onChange={(e) => setTrip(e.target.value)}
+  />
+</div>
+
             <div className="md:col-span-2">
               <Button
                 className="bg-purple-700 text-white w-full"
@@ -190,34 +238,52 @@ const ExpenseTracker = () => {
           </div>
         </div>
 
-        {/* Columns: Added & Spent */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Added */}
-          <div>
-            <h3 className="text-xl font-semibold mb-2">💰 Who Added Money</h3>
-            <div className="space-y-4">
-              {expenses
-                .filter((e) => e.type === "added")
-                .map((exp, idx) => (
-                  <Card key={idx} className="bg-green-800 text-white">
-                    <CardContent className="p-3 space-y-1">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-8 h-8 bg-white text-black rounded-full flex items-center justify-center font-bold">
-                          {exp.name[0]?.toUpperCase()}
-                        </div>
-                        <p className="font-semibold">{exp.name}</p>
-                      </div>
-                      <p>+ ₹{exp.amount}</p>
-                      {exp.description && (
-                        <p className="text-sm text-gray-200">
-                          {exp.description}
-                        </p>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
+        <div className="w-full md:w-1/2 space-y-4">
+  <h3 className="text-lg font-bold mb-2">💰 Added</h3>
+
+  {expenses
+    .filter((e) => e.type === "added")
+    .map((exp) => (
+      <Card key={exp.id} className="bg-green-800 text-white">
+        <CardContent className="p-3 space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-white text-black rounded-full flex items-center justify-center font-bold">
+                {exp.name[0]?.toUpperCase()}
+              </div>
+              <p className="font-semibold">{exp.name}</p>
+            </div>
+            <div className="flex gap-2">
+            
+             <Button
+  variant="outline"
+  size="sm"
+  onClick={() => {
+    const newAmount = prompt("Enter new amount:", exp.amount);
+    const newDescription = prompt("Enter new description:", exp.description || "");
+
+    if (newAmount) {
+      handleUpdate(exp.id, {
+        amount: newAmount,
+        description: newDescription,
+      });
+    }
+  }}
+>
+  Update
+</Button>
+
             </div>
           </div>
+          <p>+ ₹{exp.amount}</p>
+          {exp.description && (
+            <p className="text-sm text-gray-200">{exp.description}</p>
+          )}
+        </CardContent>
+      </Card>
+    ))}
+</div>
+
 
           {/* Spent */}
           <div>
@@ -247,8 +313,10 @@ const ExpenseTracker = () => {
           </div>
         </div>
       </div>
-    </div>
+    
   );
 };
 
 export default ExpenseTracker;
+
+

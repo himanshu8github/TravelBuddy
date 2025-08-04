@@ -58,7 +58,7 @@ const Dashboard = () => {
       title: "Explore Paid Plans",
       icon: <FaHistory className="text-purple-600 text-5xl mr-2" />,
       desc: "Upgrade now and experience the best!",
-      path: "/paiduser",
+      path: "/paidplans",
     },
     {
       title: "Explore Top Destinations",
@@ -84,34 +84,51 @@ const Dashboard = () => {
   return (
     <div className="bg-black text-white min-h-screen">
       {/* Navbar */}
-      <nav className="flex justify-between items-center text-white px-6 py-4 bg-black shadow-md fixed top-0 w-full z-10">
-        <h1
-          className="text-3xl font-bold text-white cursor-pointer"
-          onClick={() => navigate('/home')}
-        >
-          TravelBuddy
-        </h1>
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <span className="text-white">Profile</span>
-            <FaChevronDown className="text-black" />
-            <span
-              className="text-white cursor-pointer"
-              onClick={() => {
-                const section = document.getElementById('contact-section');
-                if (section) {
-                  section.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
-            >
-              Contact
-            </span>
-          </div>
-          <Button className="bg-red-600 hover:bg-red-500 text-white" onClick={logout}>
-            Logout
-          </Button>
-        </div>
-      </nav>
+  <nav className="w-full bg-black text-white shadow-md fixed top-0 z-50 px-4 py-4">
+  <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+    
+    {/* Logo */}
+    <h1
+      className="text-3xl font-bold text-white cursor-pointer"
+      onClick={() => navigate('/home')}
+    >
+      TravelBuddy
+    </h1>
+
+    {/* Right side nav links */}
+    <div className="flex items-center flex-wrap justify-center gap-4 text-lg">
+      
+      {/* Profile */}
+      <div className="flex items-center gap-1 cursor-pointer">
+        <span className="text-white">Profile</span>
+        <FaChevronDown className="text-white" />
+      </div>
+
+      {/* Contact */}
+      <span
+        className="text-white cursor-pointer hover:text-purple-300"
+        onClick={() => {
+          const section = document.getElementById('contact-section');
+          if (section) {
+            section.scrollIntoView({ behavior: 'smooth' });
+          }
+        }}
+      >
+        Contact
+      </span>
+
+      {/* Logout */}
+      <Button
+        className="bg-red-600 hover:bg-red-500 text-white"
+        onClick={logout}
+      >
+        Logout
+      </Button>
+    </div>
+  </div>
+</nav>
+
+
 
       {/* Welcome section */}
       <main className="pt-28 px-6 max-w-7xl mx-auto text-center">

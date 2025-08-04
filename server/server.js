@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import geminiRoute from "./routes/gemini.route.js";
 import chatbotRoute from "./routes/chat.route.js";
 import paymentRoute from "./routes/stripe.route.js"
-import Webhookstripe from './routes/stripe.webhook.route.js'
+import Webhookstripe from './routes/stripe.webhook.route.js';
 
 dotenv.config();
 
@@ -12,7 +12,7 @@ const app = express();
 app.use(cors());
 
 
-app.use("/api/stripe", webhookRoute);
+app.use("/api/stripe", Webhookstripe);
 app.use(express.json());
 
 //  This mounts the route at /api/generate-itinerary

@@ -49,16 +49,29 @@ const ItineraryPlanner = () => {
   return (
     <div className="min-h-screen bg-black text-white font-sans">
       {/* Navbar */}
-      <nav className="bg-black px-6 py-4 shadow-md flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-white">TravelBuddy</h1>
-        <div className="space-x-6">
-            <Button variant="ghost" onClick={() => navigate("/dashboard")}>
-                      Home
-                    </Button>
-          <Link to='/aiplanner' className="text-white hover:text-purple-300 text-lg">AI Planner</Link>
-          <Button onClick={handleLogout} className="bg-red-700 hover:bg-red-800 text-white px-4">Logout</Button>
-        </div>
-      </nav>
+   <nav className="bg-black px-4 py-4 shadow-md flex flex-col sm:flex-row sm:items-center sm:justify-between">
+
+  <div className="w-full text-center sm:text-left mb-2 sm:mb-0">
+    <h1 className="text-3xl font-bold text-white">TravelBuddy</h1>
+  </div>
+
+
+  <div className="flex flex-row justify-center sm:justify-end items-center gap-4 w-full sm:w-auto">
+    <Button variant="ghost" className="text-xl" onClick={() => navigate("/dashboard")}>
+      Home
+    </Button>
+
+    <Link to="/itenary">
+      <Button variant="ghost" className="text-xl">Itinerary</Button>
+    </Link>
+
+    <Button className="bg-red-600 text-white" onClick={handleLogout}>
+      Logout
+    </Button>
+  </div>
+</nav>
+
+
 
       {/* Main Section */}
       <div className="p-6 max-w-6xl mx-auto">
