@@ -3,7 +3,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-import bodyParser from "body-parser";
 import geminiRoute from "./routes/gemini.route.js";
 import chatbotRoute from "./routes/chat.route.js";
 import paymentRoute from "./routes/stripe.route.js";
@@ -17,6 +16,9 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+app.use("/api/stripe", Webhookstripe);
+
+app.use(express.json());
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
@@ -24,9 +26,6 @@ app.use(
   })
 );
 
-app.use("/api/stripe", Webhookstripe);
-
-app.use(express.json());
 
 app.use("/api", geminiRoute);
 app.use("/api/chat-suggestions", chatbotRoute);
