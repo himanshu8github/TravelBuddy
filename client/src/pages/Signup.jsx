@@ -1,12 +1,12 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth , analytics} from "../firebase";
+import { auth, provider, analytics } from "../firebase";
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Nav from "../components/Nav";
 import useAuthStore from "../store/authstore";
-import { getAnalytics, logEvent } from "firebase/analytics";
+import { logEvent } from "firebase/analytics";
 
 
 
@@ -25,12 +25,13 @@ const Signup = () => {
       const result = await signInWithPopup(auth, provider);
       console.log("User signed up:", result.user);
 
-      
-     logEvent(analytics, 'signup_with_google', {
-      uid: result.user.uid,
-      email: result.user.email
-    });
-
+   if (analytics) {
+      logEvent(analytics, "sign_up", {
+        method: "google",
+        email: user.email,
+        uid: user.uid,
+      });
+    }
       useAuthStore.getState().setUser({
   uid: result.user.uid,
   name: result.user.displayName,
