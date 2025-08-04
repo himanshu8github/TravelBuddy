@@ -16,11 +16,15 @@ const Payment = () => {
         return;
       }
 
-      try {
-        const res = await axios.post("http://localhost:5000/api/payment/create-checkout-session", {
-          plan,
-          email: user.email, 
-        });
+     try {
+  const res = await axios.post(
+    `${import.meta.env.VITE_API_BASE_URL}/api/payment/create-checkout-session`,
+    {
+      plan,
+      email: user.email,
+    }
+  );
+
 
         if (res.data?.url) {
           window.location.assign(res.data.url);

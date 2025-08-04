@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import bodyParser from "body-parser";
 import geminiRoute from "./routes/gemini.route.js";
 import chatbotRoute from "./routes/chat.route.js";
 import paymentRoute from "./routes/stripe.route.js"
@@ -9,10 +10,16 @@ import Webhookstripe from './routes/stripe.webhook.route.js';
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL, // only allow your frontend domain
+    credentials: true,
+  })
+);
+
+app.use("/api/stripe", bodyParser.raw({ type: "application/json" }), Webhookstripe);
 
 
-app.use("/api/stripe", Webhookstripe);
 app.use(express.json());
 
 //  This mounts the route at /api/generate-itinerary

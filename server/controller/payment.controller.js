@@ -38,8 +38,8 @@ const createCheckoutSession = async (req, res) => {
       ],
       mode: "subscription",
       customer_email: req.body.email,
-      success_url: "http://localhost:5173/success",
-      cancel_url: "http://localhost:5173/cancel",
+      success_url: `${process.env.FRONTEND_URL}/success`,
+cancel_url: `${process.env.FRONTEND_URL}/cancel`,
     });
 
     res.json({ url: session.url });

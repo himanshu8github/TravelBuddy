@@ -29,10 +29,11 @@ const AiPlanner = () => {
       return;
     }
     setLoading(true);
-    try {
-      const res = await axios.post("http://localhost:5000/api/chat-suggestions", {
-        prompt,
-      });
+  try {
+  const res = await axios.post(
+    `${import.meta.env.VITE_API_BASE_URL}/api/chat-suggestions`,
+    { prompt }
+  );
       setResponses([res.data]);
     } catch (err) {
       console.error(err);

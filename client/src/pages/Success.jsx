@@ -12,11 +12,15 @@ const PaymentSuccess = () => {
     const updatePlan = async () => {
       if (!user?.email) return;
 
-      try {
-        await axios.post("http://localhost:5000/api/payment/update-plan", {
-          email: user.email,
-          status: "active",
-        });
+     try {
+  await axios.post(
+    `${import.meta.env.VITE_API_BASE_URL}/api/payment/update-plan`,
+    {
+      email: user.email,
+      status: "active",
+    }
+  );
+
 
         setTimeout(() => {
           navigate("/dashboard");
