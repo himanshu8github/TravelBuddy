@@ -1,4 +1,13 @@
 import Stripe from "stripe";
+import dotenv from 'dotenv'; 
+dotenv.config();  
+
+// console.log("Stripe Secret Key Loaded:", process.env.STRIPE_SECRET_KEY);
+
+// if (!process.env.STRIPE_SECRET_KEY?.startsWith("sk_test_")) {
+//   throw new Error(" Use only test keys for Stripe in development!");
+// }
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const createCheckoutSession = async (req, res) => {

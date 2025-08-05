@@ -89,9 +89,9 @@ const AiPlanner = () => {
         <div className="mt-10 space-y-12 max-w-4xl mx-auto px-2 sm:px-0">
           {responses.map((res, index) => (
             <div key={index} className="space-y-6">
-              <h3 className="text-2xl font-semibold text-purple-400 mb-4 break-words">
-                State: {res?.answer?.state || "Unknown"}
-              </h3>
+             <h3 className="text-2xl font-semibold text-purple-400 mb-4 break-words">
+  Destination: {res?.data?.destination || "Unknown"}
+</h3>
 
               {(res?.answer?.cities || []).map((city, i) => (
                 <Card key={i} className="shadow-lg bg-gray-900 text-white border border-purple-500">

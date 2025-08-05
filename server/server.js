@@ -1,22 +1,19 @@
-
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import cors from "cors";
-// import geminiRoute from "./routes/gemini.route.js";
-import chatbotRoute from "./routes/chat.route.js";
+
+import chatbotRoute from "./routes/chat.cohere.route.js";
 import paymentRoute from "./routes/stripe.route.js";
 import Webhookstripe from './routes/stripe.webhook.route.js';
-import cohereRoute from './routes/cohere.iteneray.route.js'
-
-
-
+import cohereRoute from './routes/cohere.iteneray.route.js';
 
 const app = express();
 
 app.use("/api/stripe", Webhookstripe);
 
 app.use(express.json());
+
 const allowedOrigins = [
   "http://localhost:5173",
   "https://travelbuddy-1-m1pr.onrender.com",
@@ -25,7 +22,6 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -36,9 +32,7 @@ app.use(
   })
 );
 
-
-app.use("/api", cohereRoute);
-// app.use("/api", geminiRoute);
+app.use("/api/itinerary", cohereRoute);
 app.use("/api/chat-suggestions", chatbotRoute);
 app.use("/api/payment", paymentRoute);
 
