@@ -1,20 +1,22 @@
-import express from "express";
+
 import dotenv from "dotenv";
+dotenv.config();
+import express from "express";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-dotenv.config();
 
 const router = express.Router();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-router.post("/chat-suggestions", async (req, res) => {
+
+router.post("/", async (req, res) => {
   try {
     const { prompt } = req.body;
     if (!prompt || typeof prompt !== "string") {
       return res.status(400).json({ success: false, message: "Invalid input." });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
     const generationConfig = {
       maxOutputTokens: 1024,
@@ -29,7 +31,7 @@ router.post("/chat-suggestions", async (req, res) => {
       generationConfig,
     });
 
-    const isValid = validationResponse.response.text().trim().toLowerCase();
+    const isValid = /^["']?\s*true\s*["']?$/i.test(validationResponse.response.text().trim());
     console.log("Validation:", isValid);
 
     if (isValid !== "true") {

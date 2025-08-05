@@ -19,18 +19,26 @@ const ItineraryPlanner = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/generate-itinerary`, form);
-      setResult(res.data);
-    } catch (err) {
-      console.error('API Error:', err);
-    } finally {
-      setLoading(false);
-    }
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+
+  const payload = {
+    ...form,
+    tripType: form.groupType,
   };
+  delete payload.groupType;
+
+  try {
+    const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/createitinerary`, payload);
+    setResult(res.data.data);
+  } catch (err) {
+    console.error('API Error:', err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleLogout = async () => {
     const auth = getAuth();
@@ -156,26 +164,31 @@ const ItineraryPlanner = () => {
             </section>
 
             {/* Day-wise Itinerary */}
-            <section>
-              <h2 className="text-3xl font-bold mb-6 text-purple-400">🗓️ Day-wise Itinerary</h2>
-              <div className="space-y-6">
-                {result.itinerary?.map((dayPlan, dayIdx) => (
-                  <div key={dayIdx} className="bg-white text-black p-6 rounded-xl shadow-lg">
-                    <h3 className="text-xl font-bold text-purple-700 mb-2">Day {dayPlan.day}</h3>
-                    <div className="space-y-3">
-                      {dayPlan.activities?.map((act, actIdx) => (
-                        <div key={actIdx} className="bg-gray-100 border-l-4 border-purple-600 p-4 rounded">
-                          <p className="font-semibold">{act.placeName}</p>
-                          <p className="text-sm">{act.details}</p>
-                          <p className="text-sm">🕒 Travel Time: {act.travelTime}</p>
-                          <p className="text-sm">🎟️ Ticket Price: {act.ticketPrice}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+<section>
+  <h2 className="text-3xl font-bold mb-6 text-purple-400">🗓️ Day-wise Itinerary</h2>
+  <div className="space-y-6">
+    {result.itinerary?.map((dayPlan, dayIdx) => {
+      const showTicketInfo = parseInt(form.days) <= 20 || parseInt(dayPlan.day) <= 10;
+
+      return (
+        <div key={dayIdx} className="bg-white text-black p-6 rounded-xl shadow-lg">
+          <h3 className="text-xl font-bold text-purple-700 mb-2">Day {dayPlan.day}</h3>
+          <div className="space-y-3">
+            {dayPlan.activities?.map((act, actIdx) => (
+              <div key={actIdx} className="bg-gray-100 border-l-4 border-purple-600 p-4 rounded">
+                <p className="font-semibold">{act.placeName}</p>
+                <p className="text-sm">{act.details}</p>
+                {showTicketInfo && act.ticketPrice && (
+                  <p className="text-sm">🎟️ Ticket Price: {act.ticketPrice}</p>
+                )}
               </div>
-            </section>
+            ))}
+          </div>
+        </div>
+      );
+    })}
+  </div>
+</section>
 
             {/* Confirm Button */}
             <div className="flex justify-center mt-10">
