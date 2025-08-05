@@ -40,7 +40,9 @@ const Payment = () => {
     createSession();
   }, [plan, user, navigate]);
 
-  return <p className="text-white p-8">Redirecting to payment...</p>;
+  <div className="flex items-center justify-center min-h-screen bg-black text-white text-xl">
+    <p>Preparing secure checkout... Please wait</p>
+  </div>
 };
 
 export default Payment;

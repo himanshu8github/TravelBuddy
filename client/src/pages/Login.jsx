@@ -1,10 +1,10 @@
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth, provider, analytics } from "../firebase";
+import { useEffect, useState } from "react";
+import { setPersistence, browserLocalPersistence, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth, analytics } from "../firebase";
 import { logEvent } from "firebase/analytics";
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import Nav from "../components/Nav";
 import useAuthStore from "../store/authstore";
 
@@ -14,6 +14,12 @@ const Login = () => {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
+   useEffect(() => {
+    if (auth.currentUser) {
+      navigate("/dashboard");
+    }
+  }, [navigate]);
+
 
   const handleGoogleLogin = async () => {
     if (loading) return;
@@ -21,6 +27,7 @@ const Login = () => {
 
     try {
       const provider = new GoogleAuthProvider();
+       await setPersistence(auth, browserLocalPersistence);
       const result = await signInWithPopup(auth, provider);
       console.log("User logged in:", result.user);
 

@@ -1,5 +1,5 @@
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth, provider, analytics } from "../firebase";
+import { setPersistence, browserLocalPersistence,GoogleAuthProvider,signInWithPopup, } from "firebase/auth";
+import { auth,  analytics } from "../firebase";
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
@@ -14,14 +14,25 @@ const Signup = () => {
   const navigate = useNavigate();
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false); 
+  const [error, setError] = useState("");
+
 
 
   const handleGoogleSignup = async () => {
     if (loading) return;
+
+     if (auth.currentUser) {
+    console.log("Already signed in");
+    navigate("/dashboard");
+    return;
+  }
     setLoading(true);
+
+
     
     try {
       const provider = new GoogleAuthProvider();
+      await setPersistence(auth, browserLocalPersistence);
       const result = await signInWithPopup(auth, provider);
       console.log("User signed up:", result.user);
 
@@ -32,6 +43,7 @@ const Signup = () => {
   uid: result.user.uid,
 });
     }
+
       useAuthStore.getState().setUser({
   uid: result.user.uid,
   name: result.user.displayName,
@@ -39,11 +51,14 @@ const Signup = () => {
 });
 
       setSuccess(true);
+      setError("");
 
       setTimeout(() => {
-        navigate("/login");
+        navigate("/dashboard");
       }, 1000);
     } catch (error) {
+      setError(error.message);
+
       console.error("Google signup error:", error.message);
     } finally {
       setLoading(false);
@@ -58,10 +73,15 @@ const Signup = () => {
       </div>
 
       {/* Signup content with padding to avoid overlap */}
+      
       <div className="bg-black min-h-screen pt-20 flex items-center justify-center">
         <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md text-center">
           <h2 className="text-3xl font-bold mb-4 text-black">Welcome to TravelBuddy</h2>
           <p className="text-s font-bold mb-6">New User? Create Account</p>
+          
+           {error && (
+    <div className="mb-4 text-red-600 font-semibold">{error}</div>
+  )}
 
           <Button
             onClick={handleGoogleSignup}

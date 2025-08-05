@@ -13,9 +13,12 @@ import ExpenseTracker from "./pages/ExpenseTracker";
 import Payment from "./pages/Payment"
 import Success from "./pages/Success";
 import Cancel from "./pages/Cancel";
+import useSyncAuth from './hooks/auth.hook.js';
 
 
 function App() {
+  useSyncAuth();
+
   return (
     <Router>
       <Routes>

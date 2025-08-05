@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,36 +19,53 @@ import {
   onSnapshot,
   query,
   where,
+  orderBy,
 } from "firebase/firestore";
 import { auth, db } from "@/firebase";
 
 const ExpenseTracker = () => {
   const navigate = useNavigate();
+
   const [expenses, setExpenses] = useState([]);
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [trip, setTrip] = useState("");
-  const [description, setDescription] = useState("");
+  const [description, setDescription] = useState(""); // For display only, no editing
   const [type, setType] = useState("added");
+  const [user, setUser] = useState(null);
+  const [editingExpenseId, setEditingExpenseId] = useState(null);
+  const [originalExpense, setOriginalExpense] = useState(null); // To track original data before edit
+
+  const formRef = useRef(null);
 
   useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      if (!user) return;
-
-      const q = query(collection(db, "expenses"), where("uid", "==", user.uid));
-      const unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
-        const list = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setExpenses(list);
-      });
-
-      return () => unsubscribeSnapshot();
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
     });
-
     return () => unsubscribeAuth();
   }, []);
+
+  useEffect(() => {
+    if (!user) {
+      setExpenses([]);
+      return;
+    }
+    const q = query(
+      collection(db, "expenses"),
+      where("uid", "==", user.uid),
+      orderBy("createdAt", "desc")
+    );
+
+    const unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
+      const list = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setExpenses(list);
+    });
+
+    return () => unsubscribeSnapshot();
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -59,58 +76,114 @@ const ExpenseTracker = () => {
     }
   };
 
-  const handleAddExpense = async () => {
+  const scrollToForm = () => {
+    if (formRef.current) {
+      formRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handleEditClick = (expense) => {
+    setEditingExpenseId(expense.id);
+    setName(expense.name);
+    setAmount(expense.amount.toString());
+    setDescription(expense.description || "");
+    setType(expense.type);
+    setTrip(expense.trip || "");
+    setOriginalExpense(expense);
+    scrollToForm();
+  };
+
+  const generateDescription = (original, updated) => {
+    let changes = [];
+
+    if (original.name !== updated.name) {
+      changes.push(`name changed from "${original.name}" to "${updated.name}"`);
+    }
+    if (original.amount !== updated.amount) {
+      changes.push(`amount changed from ₹${original.amount} to ₹${updated.amount}`);
+    }
+    if (original.trip !== updated.trip) {
+      changes.push(
+        `trip changed from "${original.trip || "Miscellaneous"}" to "${updated.trip || "Miscellaneous"}"`
+      );
+    }
+    if (original.type !== updated.type) {
+      changes.push(`type changed from "${original.type}" to "${updated.type}"`);
+    }
+
+    if (changes.length === 0) {
+      return original.description || "";
+    }
+    return changes.join("; ") + ".";
+  };
+
+  const handleSaveExpense = async () => {
     if (!name || !amount || !type) return;
-
-    const user = auth.currentUser;
-     if (!user) {
-    console.error("User not logged in");
-    return;
-  }
-
-    const newExpense = {
-      uid: user.uid,
-      name,
-      amount: parseFloat(amount),
-      description,
-      type,
-      trip,
-      createdAt: serverTimestamp(),
-    };
+    if (!user) {
+      alert("Please login to add or update an expense.");
+      return;
+    }
 
     try {
-      await addDoc(collection(db, "expenses"), newExpense);
+      if (editingExpenseId && originalExpense) {
+        // Prepare updated values
+        const updated = {
+          name,
+          amount: parseFloat(amount),
+          trip,
+          type,
+        };
+
+        // Generate new description automatically
+        const newDesc = generateDescription(originalExpense, updated);
+
+        // Update existing expense with generated description
+        const expenseRef = doc(db, "expenses", editingExpenseId);
+        await updateDoc(expenseRef, {
+          ...updated,
+          description: newDesc,
+          updatedAt: serverTimestamp(),
+        });
+        setEditingExpenseId(null);
+        setOriginalExpense(null);
+      } else {
+        // Add new expense (user can set description manually)
+        await addDoc(collection(db, "expenses"), {
+          uid: user.uid,
+          name,
+          amount: parseFloat(amount),
+          description, // user entered description
+          type,
+          trip,
+          createdAt: serverTimestamp(),
+        });
+      }
+
+      // Clear form fields after save
       setName("");
       setAmount("");
       setDescription("");
       setType("added");
       setTrip("");
-      
-
     } catch (error) {
-      console.error("Error adding expense:", error);
+      console.error("Error saving expense:", error);
     }
   };
 
-  const handleUpdate = async (id, oldAmount, oldDesc) => {
-    const newAmount = prompt("Enter new amount:", oldAmount);
-    const newDesc = prompt("Enter new description:", oldDesc || "");
-    if (!newAmount) return;
-
-    try {
-      const expenseRef = doc(db, "expenses", id);
-      await updateDoc(expenseRef, {
-        amount: parseFloat(newAmount),
-        description: `${newDesc} (changed from ₹${oldAmount} to ₹${newAmount})`,
-      });
-    } catch (error) {
-      console.error("Error updating expense:", error);
-    }
+  const handleCancelEdit = () => {
+    setEditingExpenseId(null);
+    setOriginalExpense(null);
+    setName("");
+    setAmount("");
+    setDescription("");
+    setType("added");
+    setTrip("");
   };
 
   const groupedByTrip = expenses.reduce((acc, curr) => {
-    if (!acc[curr.trip]) acc[curr.trip] = [];
-    acc[curr.trip].push(curr);
+    const tripName = curr.trip || "Miscellaneous";
+    if (!acc[tripName]) acc[tripName] = [];
+    acc[tripName].push(curr);
     return acc;
   }, {});
 
@@ -132,18 +205,20 @@ const ExpenseTracker = () => {
             >
               Home
             </Button>
-            <Button
-              className="bg-red-600 hover:bg-red-700"
-              onClick={handleLogout}
-            >
-              Logout
-            </Button>
+            {user && (
+              <Button
+                className="bg-red-600 hover:bg-red-700"
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
+            )}
           </div>
         </div>
       </nav>
 
       {/* Content */}
-      <div className="pt-32 px-6 max-w-5xl mx-auto space-y-6">
+      <div className="pt-32 px-6 max-w-5xl mx-auto space-y-6" ref={formRef}>
         <h2 className="text-3xl font-bold text-center mb-4">
           Travel Expense Tracker
         </h2>
@@ -170,11 +245,18 @@ const ExpenseTracker = () => {
             </div>
             <div className="md:col-span-2">
               <Label>Description</Label>
+              {/* Show description but disable editing during update */}
               <Input
                 placeholder="Lunch, hotel booking, etc."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+                disabled={!!editingExpenseId} // disable editing when updating
               />
+              {editingExpenseId && (
+                <p className="text-xs text-gray-600 mt-1">
+                  Description is auto-generated during updates.
+                </p>
+              )}
             </div>
             <div>
               <Label>Type</Label>
@@ -196,13 +278,22 @@ const ExpenseTracker = () => {
                 onChange={(e) => setTrip(e.target.value)}
               />
             </div>
-            <div className="md:col-span-2">
+            <div className="md:col-span-2 flex gap-2">
               <Button
                 className="bg-purple-700 text-white w-full"
-                onClick={handleAddExpense}
+                onClick={handleSaveExpense}
               >
-                Add Expense
+                {editingExpenseId ? "Update Expense" : "Add Expense"}
               </Button>
+              {editingExpenseId && (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleCancelEdit}
+                >
+                  Cancel
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -258,22 +349,15 @@ const ExpenseTracker = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() =>
-                                handleUpdate(
-                                  exp.id,
-                                  exp.amount,
-                                  exp.description
-                                )
-                              }
+                              className="text-black"
+                              onClick={() => handleEditClick(exp)}
                             >
                               Update
                             </Button>
                           </div>
                           <p>+ ₹{exp.amount}</p>
                           {exp.description && (
-                            <p className="text-sm text-gray-200">
-                              {exp.description}
-                            </p>
+                            <p className="text-sm text-gray-200">{exp.description}</p>
                           )}
                         </CardContent>
                       </Card>
@@ -301,22 +385,15 @@ const ExpenseTracker = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() =>
-                                handleUpdate(
-                                  exp.id,
-                                  exp.amount,
-                                  exp.description
-                                )
-                              }
+                              className="text-black"
+                              onClick={() => handleEditClick(exp)}
                             >
                               Update
                             </Button>
                           </div>
                           <p>- ₹{exp.amount}</p>
                           {exp.description && (
-                            <p className="text-sm text-gray-200">
-                              {exp.description}
-                            </p>
+                            <p className="text-sm text-gray-200">{exp.description}</p>
                           )}
                         </CardContent>
                       </Card>

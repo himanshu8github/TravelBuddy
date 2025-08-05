@@ -1,5 +1,5 @@
 
-import { collection,  query, where, addDoc } from "firebase/firestore";
+import { collection,  query, where, addDoc, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 
 export const addTrip = async (trip) => {

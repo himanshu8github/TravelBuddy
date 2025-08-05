@@ -47,12 +47,13 @@ const createCheckoutSession = async (req, res) => {
       ],
       mode: "subscription",
       customer_email: req.body.email,
-      success_url: `${process.env.FRONTEND_URL}/success`,
-cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+      success_url: `${process.env.FRONTEND_URL}/dashboard?checkout=success`,
+       cancel_url: `${process.env.FRONTEND_URL}/dashboard?checkout=cancel`,
     });
 
     res.json({ url: session.url });
   } catch (error) {
+    console.error("Stripe Error:", error);
     res.status(500).json({ error: "Failed to create Stripe session" });
   }
 };

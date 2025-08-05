@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { addTrip, fetchTripsByUser } from '../utils/firebaseDBUtils';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,34 +12,71 @@ import {
   FaHistory,
   FaChevronDown,
 } from "react-icons/fa";
-
-
-
+import toast, { Toaster } from 'react-hot-toast';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [searchParams] = useSearchParams();
+  const checkoutStatus = searchParams.get("checkout");
 
   useEffect(() => {
-    const loadTrips = async () => {
-      const trips = await fetchTripsByUser("abc123");
-      console.log("User Trips: ", trips);
-    };
-    loadTrips();
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (!user) return;
+    const loadTrips = async () => {
+      try {
+        const trips = await fetchTripsByUser(user.uid);
+        console.log("User Trips: ", trips);
+      } catch (error) {
+        console.error("Failed to fetch trips:", error);
+      }
+    };
+    loadTrips();
+  }, [user]);
+
+
+  useEffect(() => {
+    if (checkoutStatus === 'success') {
+      toast.success("🎉 Payment successful! Welcome to premium.");
+    } else if (checkoutStatus === 'cancel') {
+      toast.error("❌ Payment cancelled.");
+    }
+  }, [checkoutStatus]);
+
   const handleAddTrip = async () => {
+    if (!user) {
+      console.error("User not signed in");
+      return;
+    }
     const newTrip = {
-      userId: "abc123",
+      userId: user.uid,
       destination: "Manali",
       budget: 20000,
       startDate: "2025-08-05",
     };
-    const id = await addTrip(newTrip);
-    console.log("New trip ID:", id);
+    try {
+      const id = await addTrip(newTrip);
+      console.log("New trip ID:", id);
+    } catch (error) {
+      console.error("Failed to add trip:", error);
+    }
   };
 
-  const logout = () => {
-    navigate('/login');
+  const logout = async () => {
+    const auth = getAuth();
+    try {
+      await signOut(auth);
+      navigate('/login');
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   const cards = [
@@ -54,7 +92,7 @@ const Dashboard = () => {
       desc: "Ask our AI for recommendations.",
       path: "/aiplanner",
     },
-     {
+    {
       title: "Explore Paid Plans",
       icon: <FaHistory className="text-purple-600 text-5xl mr-2" />,
       desc: "Upgrade now and experience the best!",
@@ -66,7 +104,6 @@ const Dashboard = () => {
       desc: "Explore the most visited spots.",
       path: "/explore",
     },
-   
     {
       title: "Expense Tracker",
       icon: <FaWallet className="text-purple-600 text-5xl mr-2" />,
@@ -83,52 +120,43 @@ const Dashboard = () => {
 
   return (
     <div className="bg-black text-white min-h-screen">
+      <Toaster position="top-center" />
+
       {/* Navbar */}
-  <nav className="w-full bg-black text-white shadow-md fixed top-0 z-50 px-4 py-4">
-  <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-    
-    {/* Logo */}
-    <h1
-      className="text-3xl font-bold text-white cursor-pointer"
-      onClick={() => navigate('/home')}
-    >
-      TravelBuddy
-    </h1>
+      <nav className="w-full bg-black text-white shadow-md fixed top-0 z-50 px-4 py-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+          <h1
+            className="text-3xl font-bold text-white cursor-pointer"
+            onClick={() => navigate('/home')}
+          >
+            TravelBuddy
+          </h1>
 
-    {/* Right side nav links */}
-    <div className="flex items-center flex-wrap justify-center gap-4 text-lg">
-      
-      {/* Profile */}
-      <div className="flex items-center gap-1 cursor-pointer">
-        <span className="text-white">Profile</span>
-        <FaChevronDown className="text-white" />
-      </div>
-
-      {/* Contact */}
-      <span
-        className="text-white cursor-pointer hover:text-purple-300"
-        onClick={() => {
-          const section = document.getElementById('contact-section');
-          if (section) {
-            section.scrollIntoView({ behavior: 'smooth' });
-          }
-        }}
-      >
-        Contact
-      </span>
-
-      {/* Logout */}
-      <Button
-        className="bg-red-600 hover:bg-red-500 text-white"
-        onClick={logout}
-      >
-        Logout
-      </Button>
-    </div>
-  </div>
-</nav>
-
-
+          <div className="flex items-center flex-wrap justify-center gap-4 text-lg">
+            <div className="flex items-center gap-1 cursor-pointer">
+              <span className="text-white">Profile</span>
+              <FaChevronDown className="text-white" />
+            </div>
+            <span
+              className="text-white cursor-pointer hover:text-purple-300"
+              onClick={() => {
+                const section = document.getElementById('contact-section');
+                if (section) {
+                  section.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+            >
+              Contact
+            </span>
+            <Button
+              className="bg-red-600 hover:bg-red-500 text-white"
+              onClick={logout}
+            >
+              Logout
+            </Button>
+          </div>
+        </div>
+      </nav>
 
       {/* Welcome section */}
       <main className="pt-28 px-6 max-w-7xl mx-auto text-center">

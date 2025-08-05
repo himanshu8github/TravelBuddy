@@ -32,7 +32,7 @@ app.use(
   })
 );
 
-app.use("/api/itinerary", cohereRoute);
+app.use("/api", cohereRoute);
 app.use("/api/chat-suggestions", chatbotRoute);
 app.use("/api/payment", paymentRoute);
 
