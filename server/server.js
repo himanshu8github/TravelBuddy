@@ -1,5 +1,8 @@
 import dotenv from "dotenv";
-dotenv.config();
+dotenv.config({
+  path: process.env.NODE_ENV === "production" ? ".env.production" : ".env.development",
+});
+
 import express from "express";
 import cors from "cors";
 
@@ -11,18 +14,13 @@ import cohereRoute from './routes/cohere.iteneray.route.js';
 const app = express();
 
 app.use("/api/stripe", Webhookstripe);
-
 app.use(express.json());
-
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://travelbuddy-1-m1pr.onrender.com",
-];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      const allowedOrigin = process.env.FRONTEND_URL;
+      if (!origin || origin === allowedOrigin) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
