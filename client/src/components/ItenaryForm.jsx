@@ -30,7 +30,7 @@ const ItineraryPlanner = () => {
   delete payload.groupType;
 
   try {
-    const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/createitinerary`, payload);
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/createitinerary`, payload);
     setResult(res.data.data);
   } catch (err) {
     console.error('API Error:', err);
