@@ -1,0 +1,7 @@
+readme.txt
+data.txtserver/.env.development
+.env
+.env.development
+.env.production
+node_modules/
+data.txt
