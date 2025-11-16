@@ -20,8 +20,13 @@ import {
   FaUsers,
   FaCoins,
   FaMapMarkedAlt,
+  FaRoute,
+  FaLightbulb,
+  FaBed,
+  FaUtensils,
 } from "react-icons/fa";
-import { FiSend } from "react-icons/fi";
+import { WiDayCloudy } from "react-icons/wi";
+import { FiPackage, FiSend } from "react-icons/fi";
 
 const ItineraryPlanner = () => {
   const [form, setForm] = useState({
@@ -84,12 +89,36 @@ const ItineraryPlanner = () => {
     }
   };
 
+  // For desktop TabButtons (kept as-is)
+  const tabList = [
+    { id: "cost", label: "Cost" },
+    { id: "weather", label: "Weather" },
+    { id: "packing", label: "Packing" },
+    { id: "route", label: "Route" },
+    { id: "tips", label: "Tips" },
+    { id: "stays", label: "Stays" },
+    { id: "restaurants", label: "Restaurants" },
+    { id: "itinerary", label: "Itinerary" },
+  ];
+
+  // Mobile tabs with icon + label
+  const tabMeta = [
+    { id: "cost", label: "Cost", icon: <FaCoins className="text-pink-300/90" /> },
+    { id: "weather", label: "Weather", icon: <WiDayCloudy className="text-pink-300/90" /> },
+    { id: "packing", label: "Packing", icon: <FiPackage className="text-pink-300/90" /> },
+    { id: "route", label: "Route", icon: <FaRoute className="text-pink-300/90" /> },
+    { id: "tips", label: "Tips", icon: <FaLightbulb className="text-pink-300/90" /> },
+    { id: "stays", label: "Stays", icon: <FaBed className="text-pink-300/90" /> },
+    { id: "restaurants", label: "Restaurants", icon: <FaUtensils className="text-pink-300/90" /> },
+    { id: "itinerary", label: "Itinerary", icon: <FaRegCalendarAlt className="text-pink-300/90" /> },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a0a0b] via-[#0e0e10] to-black text-white font-sans">
       {/* Navbar */}
       <nav
         className="bg-black/40 backdrop-blur-lg px-6 py-4 border-b sticky top-0 z-50"
-        style={{ borderColor: "rgba(255,175,189,0.18)" }} // soft pink border
+        style={{ borderColor: "rgba(255,175,189,0.18)" }}
       >
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div>
@@ -137,9 +166,6 @@ const ItineraryPlanner = () => {
       <div className="max-w-6xl mx-auto p-6">
         {/* Hero */}
         <div className="relative text-center py-16 overflow-hidden">
-          {/* Single subtle icon (fix: not three) */}
-        
-
           <h1 className="animated-title text-5xl md:text-6xl font-extrabold mb-4 tracking-tight">
             Plan Your Next Adventure
           </h1>
@@ -159,7 +185,7 @@ const ItineraryPlanner = () => {
 
         {/* Form */}
         <div
-          className="bg-[#101014]/80 border backdrop-blur-md rounded-2xl p-8 shadow-xl"
+          className="bg-[#101014]/80 border backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-xl"
           style={{ borderColor: "rgba(255,175,189,0.22)" }}
         >
           <h2
@@ -171,7 +197,7 @@ const ItineraryPlanner = () => {
 
           <form
             onSubmit={handleSubmit}
-            className="grid grid-cols-1 md:grid-cols-12 gap-6"
+            className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6"
           >
             {/* Destination */}
             <div className="md:col-span-6">
@@ -189,7 +215,7 @@ const ItineraryPlanner = () => {
                   placeholder="e.g. Goa, Manali, Rishikesh"
                   onChange={handleChange}
                   required
-                  className="w-full pl-10 py-3 bg-[#0c0c12] border rounded-lg outline-none transition text-sm placeholder:text-gray-500 focus:ring-0"
+                  className="w-full min-w-0 pl-10 py-3 bg-[#0c0c12] border rounded-lg outline-none transition text-sm placeholder:text-gray-500 focus:ring-0"
                   style={{
                     borderColor: "rgba(255,175,189,0.25)",
                     color: "#fef6f8",
@@ -215,7 +241,7 @@ const ItineraryPlanner = () => {
                   name="startDate"
                   required
                   onChange={handleChange}
-                  className="w-full pl-10 py-3 bg-[#0c0c12] border rounded-lg outline-none text-sm focus:ring-0"
+                  className="w-full min-w-0 pl-10 py-3 bg-[#0c0c12] border rounded-lg outline-none text-sm focus:ring-0"
                   style={{
                     borderColor: "rgba(255,175,189,0.25)",
                     color: "#fef6f8",
@@ -242,7 +268,7 @@ const ItineraryPlanner = () => {
                   min="1"
                   required
                   onChange={handleChange}
-                  className="w-full pl-10 py-3 bg-[#0c0c12] border rounded-lg outline-none text-sm focus:ring-0"
+                  className="w-full min-w-0 pl-10 py-3 bg-[#0c0c12] border rounded-lg outline-none text-sm focus:ring-0"
                   style={{
                     borderColor: "rgba(255,175,189,0.25)",
                     color: "#fef6f8",
@@ -267,7 +293,7 @@ const ItineraryPlanner = () => {
                   name="groupType"
                   required
                   onChange={handleChange}
-                  className="w-full pl-10 py-3 bg-[#0c0c12] border rounded-lg outline-none text-sm focus:ring-0"
+                  className="w-full min-w-0 pl-10 py-3 bg-[#0c0c12] border rounded-lg outline-none text-sm focus:ring-0"
                   style={{
                     borderColor: "rgba(255,175,189,0.25)",
                     color: "#fef6f8",
@@ -299,7 +325,7 @@ const ItineraryPlanner = () => {
                   name="budget"
                   required
                   onChange={handleChange}
-                  className="w-full pl-10 py-3 bg-[#0c0c12] border rounded-lg outline-none text-sm focus:ring-0"
+                  className="w-full min-w-0 pl-10 py-3 bg-[#0c0c12] border rounded-lg outline-none text-sm focus:ring-0"
                   style={{
                     borderColor: "rgba(255,175,189,0.25)",
                     color: "#fef6f8",
@@ -316,15 +342,12 @@ const ItineraryPlanner = () => {
               </div>
             </div>
 
-            {/* Removed End Date input (per request) */}
-            {/* We still compute endDate internally for payload */}
-
             {/* Submit */}
             <div className="md:col-span-12 flex justify-center pt-2">
               <button
                 type="submit"
                 disabled={loading}
-                className="disabled:opacity-50 px-12 py-3 rounded-xl text-black font-bold tracking-wide text-sm flex items-center gap-2 transition-transform hover:scale-[1.02]"
+                className="disabled:opacity-50 px-10 sm:px-12 py-3 rounded-xl text-black font-bold tracking-wide text-sm flex items-center gap-2 transition-transform hover:scale-[1.02]"
                 style={{
                   background: "linear-gradient(90deg,#ff8fab,#fb6f92)",
                   boxShadow: "0 6px 20px rgba(251,111,146,0.22)",
@@ -345,8 +368,8 @@ const ItineraryPlanner = () => {
           </form>
         </div>
 
-        {/* Tabs */}
-        <div className="mt-10">
+        {/* Tabs (desktop) */}
+        <div className="mt-10 hidden md:block">
           <TabButtons
             activeTab={activeTab}
             onTabClick={setActiveTab}
@@ -355,6 +378,30 @@ const ItineraryPlanner = () => {
             alwaysVisible
             disabled={!result}
           />
+        </div>
+
+        {/* Tabs (mobile: icon + label together) */}
+        <div className="mt-4 md:hidden">
+          <div className="grid grid-cols-4 gap-2 px-1 py-2">
+            {tabMeta.map((t) => {
+              const isActive = activeTab === t.id;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setActiveTab(t.id)}
+                  title={t.label}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`flex items-center gap-2 flex-shrink-0 px-3 py-2 rounded-md text-xs font-medium border transition-colors
+                    ${isActive
+                      ? "bg-[#111217]/70 border-[#ff8fab66] text-white"
+                      : "bg-[#0b0b0d]/40 border-transparent text-gray-300 hover:bg-[#111217]/50"}`}
+                >
+                 <span className="text-lg">{t.icon}</span>
+          <span className="whitespace-nowrap text-[10px]">{t.label}</span>
+        </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Sections */}
@@ -420,6 +467,11 @@ const ItineraryPlanner = () => {
           0%, 100% { transform: translateY(0) rotate(0deg); }
           50% { transform: translateY(-8px) rotate(-2deg); }
         }
+        /* hide scrollbar for horizontal tab row on mobile */
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        /* Ensure input containers don't overflow on very small screens */
+        input, select, textarea { min-width: 0; }
       `}</style>
     </div>
   );

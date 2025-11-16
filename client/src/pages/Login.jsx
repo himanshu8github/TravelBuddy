@@ -63,28 +63,52 @@ const Login = () => {
         <Nav />
       </div>
 
-      <div className="bg-black min-h-screen pt-24 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md text-center">
-          <h2 className="text-3xl font-bold mb-4 text-black">Welcome to TravelBuddy</h2>
-          <p className="text-s font-bold mb-6">Login using your Google account</p>
+      <div className="min-h-screen pt-24 flex items-center justify-center text-white bg-gradient-to-b from-[#0a0a0b] via-[#0e0e10] to-black">
+        <div
+          className="w-full max-w-md text-center rounded-2xl border bg-[#111217]/85 backdrop-blur shadow-xl"
+          style={{ borderColor: "rgba(255,175,189,0.22)" }}
+        >
+          <div
+            className="w-full h-0.5 rounded-t-2xl"
+            style={{ background: "linear-gradient(90deg,#ffe5ec,#ffcfd2,#ff8fab,#fb6f92)" }}
+          />
+          <div className="p-8">
+            <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-[#ffe5ec] via-[#ffcfd2] to-[#ff8fab] bg-clip-text text-transparent">
+              Welcome to TravelBuddy
+            </h2>
+            <p className="text-s font-bold mb-6 text-gray-300">Login using your Google account</p>
 
-          <Button
-            onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center gap-2 bg-white text-black border hover:bg-gray-100"
-            variant="outline"
-            disabled={loading}
-          >
-            <FcGoogle size={20} />
-            {loading ? "Logging in..." : "Login with Google"}
-          </Button>
+            <Button
+              onClick={handleGoogleLogin}
+              className="w-full flex items-center justify-center gap-2 text-white border-0 rounded-lg transition-all duration-300 hover:-translate-y-0.5"
+              style={{
+                background: "linear-gradient(90deg,#ff8fab,#fb6f92)",
+                boxShadow: "0 4px 18px rgba(251,111,146,0.25)",
+              }}
+              variant="outline"
+              disabled={loading}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "linear-gradient(90deg,#ffcfd2,#fb6f92)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "linear-gradient(90deg,#ff8fab,#fb6f92)")}
+            >
+              <FcGoogle size={20} />
+              {loading ? "Logging in..." : "Login with Google"}
+            </Button>
 
-          {success && (
-            <div className="mt-4 text-green-600 font-semibold">
-              Successfully Logged In!
-            </div>
-          )}
+            {success && (
+              <div className="mt-4 font-semibold text-green-400">
+                Successfully Logged In!
+              </div>
+            )}
+          </div>
         </div>
       </div>
+
+      <div
+        className="pointer-events-none fixed inset-0 -z-10 opacity-60"
+        style={{
+          background: "radial-gradient(circle at 20% 30%, #ff8fab22, transparent 60%)",
+        }}
+      />
     </>
   );
 };

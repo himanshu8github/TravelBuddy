@@ -29,11 +29,11 @@ const AiPlanner = () => {
       return;
     }
     setLoading(true);
-  try {
-  const res = await axios.post(
-    `${import.meta.env.VITE_API_BASE_URL}/api/chat-suggestions`,
-    { prompt }
-  );
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/chat-suggestions`,
+        { prompt }
+      );
       setResponses([res.data]);
     } catch (err) {
       console.error(err);
@@ -45,63 +45,127 @@ const AiPlanner = () => {
   return (
     <>
       <Toaster richColors position="top-center" />
-      <div className="min-h-screen bg-black text-white pb-20">
+      <div className="min-h-screen bg-gradient-to-b from-[#0a0a0b] via-[#0e0e10] to-black text-white pb-24">
         {/* Navbar */}
-        <div className="w-full bg-black shadow-md sticky top-0 z-50 px-4 py-4">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-            <h1 className="text-3xl font-bold text-white text-center sm:text-left">
+        <nav
+          className="w-full sticky top-0 z-50 px-5 py-4 bg-black/50 backdrop-blur border-b flex items-center justify-between"
+          style={{ borderColor: "rgba(255,175,189,0.18)" }}
+        >
+          <div
+            className="cursor-pointer"
+            onClick={() => navigate("/dashboard")}
+          >
+            <h1 className="text-3xl font-extrabold bg-gradient-to-r from-[#ffe5ec] via-[#ffcfd2] to-[#ff8fab] bg-clip-text text-transparent tracking-wide">
               TravelBuddy
             </h1>
-            <div className="flex flex-row sm:flex-row sm:items-center gap-2 text-lg font-semibold justify-center sm:justify-end">
-              <Button variant="ghost" className="text-white" onClick={() => navigate("/dashboard")}>
-                Home
-              </Button>
-              <Link to="/itenary">
-                <Button variant="ghost" className="text-white">
-                  Itinerary
-                </Button>
-              </Link>
-              <Button className="bg-red-600 text-white" onClick={handleLogout}>
-                Logout
-              </Button>
-            </div>
+            <p className="text-[11px] text-gray-500">Plan. Explore. Adventure.</p>
           </div>
-        </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button
+              variant="ghost"
+              className="text-sm"
+              style={{ color: "#ffdfe5" }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(255,207,210,0.12)")}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+              onClick={() => navigate("/dashboard")}
+            >
+              Home
+            </Button>
+            <Link to="/itenary">
+              <Button
+                variant="ghost"
+                className="text-sm"
+                style={{ color: "#ffdfe5" }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(255,207,210,0.12)")}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+              >
+                Itinerary
+              </Button>
+            </Link>
+            <Button
+              className="text-sm text-white shadow-sm"
+              style={{ backgroundColor: "#7a1d2f" }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#5e1624")}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#7a1d2f")}
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          </div>
+        </nav>
 
-        {/* Headings */}
-        <h1 className="text-3xl font-bold text-center my-6">Welcome to TravelBuddy</h1>
-        <h2 className="text-2xl font-bold text-center my-6">AI Destination Suggestions</h2>
+        {/* Header */}
+        <section className="max-w-3xl mx-auto text-center pt-12 px-4">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 bg-gradient-to-r from-[#ffe5ec] via-[#ffcfd2] to-[#ff8fab] bg-clip-text text-transparent">
+            AI Destination Suggestions
+          </h1>
+          <p className="text-gray-300 text-base md:text-lg">
+            Get curated destination ideas, local food, seasonal tips & experiences.
+          </p>
+          <div
+            className="mx-auto mt-6 h-[3px] w-44 rounded-full animate-pulse"
+            style={{ background: "linear-gradient(90deg,#ffe5ec,#ffcfd2,#ff8fab)" }}
+          />
+        </section>
 
         {/* Input */}
-        <div className="max-w-xl mx-auto space-y-4 px-2 sm:px-0">
-          <input
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-500 bg-gray-900 text-white rounded-md shadow-sm focus:outline-none"
-            placeholder="Enter Indian State (e.g., Uttarakhand, Kashmir)"
-          />
-          <Button className="w-full sm:w-auto" onClick={handleGenerate} disabled={loading}>
+        <div className="max-w-xl mx-auto mt-10 space-y-4 px-4">
+          <div className="relative group">
+            <input
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              className="w-full px-4 py-3 bg-[#111217] border rounded-lg outline-none text-sm placeholder:text-gray-500 focus:ring-0 transition"
+              style={{
+                borderColor: "rgba(255,175,189,0.28)",
+                color: "#fef6f8",
+              }}
+              onFocus={(e) => (e.currentTarget.style.borderColor = "#fb6f92")}
+              onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,175,189,0.28)")}
+              placeholder="Enter Indian destination (e.g., Kashmir, Goa, Jaipur)"
+            />
+          </div>
+          <Button
+            className="w-full sm:w-auto px-8 py-3 font-semibold rounded-xl disabled:opacity-50 transition-all"
+            style={{
+              background: "linear-gradient(90deg,#ff8fab,#fb6f92)",
+              boxShadow: "0 4px 18px rgba(251,111,146,0.25)"
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "linear-gradient(90deg,#ffcfd2,#fb6f92)")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "linear-gradient(90deg,#ff8fab,#fb6f92)")}
+            onClick={handleGenerate}
+            disabled={loading}
+          >
             {loading ? "Generating..." : "Get Suggestions"}
           </Button>
         </div>
 
         {/* Results */}
-        <div className="mt-10 space-y-12 max-w-4xl mx-auto px-2 sm:px-0">
+        <div className="mt-14 space-y-12 max-w-5xl mx-auto px-4">
           {responses.map((res, index) => (
             <div key={index} className="space-y-6">
-             <h3 className="text-2xl font-semibold text-purple-400 mb-4 break-words">
-  Destination: {res?.data?.destination || "Unknown"}
-</h3>
+              <h3 className="text-2xl font-semibold mb-2 bg-gradient-to-r from-[#ffe5ec] via-[#ffcfd2] to-[#ff8fab] bg-clip-text text-transparent">
+                Destination: {res?.data?.destination || "Unknown"}
+              </h3>
 
               {(res?.answer?.cities || []).map((city, i) => (
-                <Card key={i} className="shadow-lg bg-gray-900 text-white border border-purple-500">
-                  <CardContent className="p-4 sm:p-6">
-                    <h4 className="text-xl font-bold text-purple-300 mb-2 break-words">{city.name}</h4>
+                <Card
+                  key={i}
+                  className="relative overflow-hidden bg-[#121318]/90 backdrop-blur border rounded-xl transition hover:border-[#fb6f92]/50"
+                  style={{ borderColor: "rgba(255,175,189,0.22)" }}
+                >
+                  <div
+                    className="pointer-events-none absolute inset-x-0 top-0 h-0.5"
+                    style={{ background: "linear-gradient(90deg,#ffe5ec,#ffcfd2,#ff8fab,#fb6f92)" }}
+                  />
+                  <CardContent className="p-5 md:p-6">
+                    <h4 className="text-xl font-bold mb-3 text-[#ffb3c4] break-words">
+                      {city.name}
+                    </h4>
 
                     {city.spots?.length > 0 && (
-                      <div className="mb-3">
-                        <p className="font-semibold">📍 Places to Visit:</p>
-                        <ul className="list-disc list-inside text-sm text-gray-300">
+                      <div className="mb-4">
+                        <p className="font-semibold text-[#ffdfe5] text-sm">📍 Places to Visit</p>
+                        <ul className="mt-1 list-disc list-inside text-xs md:text-sm text-gray-300 space-y-0.5">
                           {city.spots.map((spot, idx) => (
                             <li key={idx}>{spot}</li>
                           ))}
@@ -110,9 +174,9 @@ const AiPlanner = () => {
                     )}
 
                     {city.experiences?.length > 0 && (
-                      <div className="mb-3">
-                        <p className="font-semibold">🌟 Unique Experiences:</p>
-                        <ul className="list-disc list-inside text-sm text-gray-300">
+                      <div className="mb-4">
+                        <p className="font-semibold text-[#ffdfe5] text-sm">🌟 Unique Experiences</p>
+                        <ul className="mt-1 list-disc list-inside text-xs md:text-sm text-gray-300 space-y-0.5">
                           {city.experiences.map((exp, idx) => (
                             <li key={idx}>{exp}</li>
                           ))}
@@ -121,9 +185,9 @@ const AiPlanner = () => {
                     )}
 
                     {city.seasonalTips?.length > 0 && (
-                      <div className="mb-3">
-                        <p className="font-semibold">❄️ Seasonal Tips:</p>
-                        <ul className="list-disc list-inside text-sm text-gray-300">
+                      <div className="mb-4">
+                        <p className="font-semibold text-[#ffdfe5] text-sm">❄️ Seasonal Tips</p>
+                        <ul className="mt-1 list-disc list-inside text-xs md:text-sm text-gray-300 space-y-0.5">
                           {city.seasonalTips.map((tip, idx) => (
                             <li key={idx}>{tip}</li>
                           ))}
@@ -132,9 +196,9 @@ const AiPlanner = () => {
                     )}
 
                     {city.localFoods?.length > 0 && (
-                      <div className="mb-3">
-                        <p className="font-semibold">🍲 Local Foods:</p>
-                        <ul className="list-disc list-inside text-sm text-gray-300">
+                      <div className="mb-4">
+                        <p className="font-semibold text-[#ffdfe5] text-sm">🍲 Local Foods</p>
+                        <ul className="mt-1 list-disc list-inside text-xs md:text-sm text-gray-300 space-y-0.5">
                           {city.localFoods.map((food, idx) => (
                             <li key={idx}>{food}</li>
                           ))}
@@ -143,9 +207,9 @@ const AiPlanner = () => {
                     )}
 
                     {city.travelTips?.length > 0 && (
-                      <div className="mb-3">
-                        <p className="font-semibold">💡 Travel Tips:</p>
-                        <ul className="list-disc list-inside text-sm text-gray-300">
+                      <div className="mb-2">
+                        <p className="font-semibold text-[#ffdfe5] text-sm">💡 Travel Tips</p>
+                        <ul className="mt-1 list-disc list-inside text-xs md:text-sm text-gray-300 space-y-0.5">
                           {city.travelTips.map((tip, idx) => (
                             <li key={idx}>{tip}</li>
                           ))}
@@ -159,6 +223,16 @@ const AiPlanner = () => {
           ))}
         </div>
       </div>
+
+      <style>{`
+        .animate-pulse {
+          animation: pulse-soft 2.6s ease-in-out infinite;
+        }
+        @keyframes pulse-soft {
+          0%,100% { opacity:.35; transform:scaleX(.96); }
+          50% { opacity:.75; transform:scaleX(1); }
+        }
+      `}</style>
     </>
   );
 };
