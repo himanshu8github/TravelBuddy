@@ -37,7 +37,7 @@ const ItineraryPlanner = () => {
     startDate: "",
   });
 
-  const [activeTab, setActiveTab] = useState("cost");
+const [activeTab, setActiveTab] = useState("itinerary");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -91,6 +91,7 @@ const ItineraryPlanner = () => {
 
   // For desktop TabButtons (kept as-is)
   const tabList = [
+     { id: "itinerary", label: "Itinerary" },
     { id: "cost", label: "Cost" },
     { id: "weather", label: "Weather" },
     { id: "packing", label: "Packing" },
@@ -98,11 +99,12 @@ const ItineraryPlanner = () => {
     { id: "tips", label: "Tips" },
     { id: "stays", label: "Stays" },
     { id: "restaurants", label: "Restaurants" },
-    { id: "itinerary", label: "Itinerary" },
+   
   ];
 
   // Mobile tabs with icon + label
   const tabMeta = [
+     { id: "itinerary", label: "Itinerary", icon: <FaRegCalendarAlt className="text-pink-300/90" /> },
     { id: "cost", label: "Cost", icon: <FaCoins className="text-pink-300/90" /> },
     { id: "weather", label: "Weather", icon: <WiDayCloudy className="text-pink-300/90" /> },
     { id: "packing", label: "Packing", icon: <FiPackage className="text-pink-300/90" /> },
@@ -110,27 +112,27 @@ const ItineraryPlanner = () => {
     { id: "tips", label: "Tips", icon: <FaLightbulb className="text-pink-300/90" /> },
     { id: "stays", label: "Stays", icon: <FaBed className="text-pink-300/90" /> },
     { id: "restaurants", label: "Restaurants", icon: <FaUtensils className="text-pink-300/90" /> },
-    { id: "itinerary", label: "Itinerary", icon: <FaRegCalendarAlt className="text-pink-300/90" /> },
+   
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a0a0b] via-[#0e0e10] to-black text-white font-sans">
       {/* Navbar */}
       <nav
-        className="bg-black/40 backdrop-blur-lg px-6 py-4 border-b sticky top-0 z-50"
+      className="bg-black/40 backdrop-blur-lg px-3 sm:px-6 py-3 sm:py-4 border-b sticky top-0 z-50"
         style={{ borderColor: "rgba(255,175,189,0.18)" }}
       >
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-[#ffe5ec] via-[#ffcfd2] to-[#ff8fab] bg-clip-text text-transparent tracking-wide">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#ffe5ec] via-[#ffcfd2] to-[#ff8fab] bg-clip-text text-transparent tracking-wide">
               TravelBuddy
             </h1>
-            <p className="text-xs text-gray-500">Plan. Explore. Adventure.</p>
+            <p className="text-[10px] sm:text-xs text-gray-500">Plan. Explore. Adventure.</p>
           </div>
-          <div className="flex gap-3">
+         <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
             <Button
               variant="ghost"
-              className="text-sm"
+             className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2"
               style={{ color: "#ffdfe5" }}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(255,207,210,0.12)")}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
@@ -391,13 +393,13 @@ const ItineraryPlanner = () => {
                   onClick={() => setActiveTab(t.id)}
                   title={t.label}
                   aria-current={isActive ? "page" : undefined}
-                  className={`flex items-center gap-2 flex-shrink-0 px-3 py-2 rounded-md text-xs font-medium border transition-colors
+                  className={`flex flex-col items-center justify-center gap-1 px-1.5 py-2 rounded-md text-xs font-medium border transition-colors
                     ${isActive
                       ? "bg-[#111217]/70 border-[#ff8fab66] text-white"
                       : "bg-[#0b0b0d]/40 border-transparent text-gray-300 hover:bg-[#111217]/50"}`}
                 >
-                 <span className="text-lg">{t.icon}</span>
-          <span className="whitespace-nowrap text-[10px]">{t.label}</span>
+                 <span className="text-sm">{t.icon}</span>
+         <span className="whitespace-nowrap text-[9px] leading-tight">{t.label}</span>
         </button>
               );
             })}
