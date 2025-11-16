@@ -9,8 +9,11 @@ export const createItinerary = async (req, res) => {
         success: false,
         message: "Missing required fields",
       });
+
+
     }
 
+    
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
     const maxDays = Math.min(Number(days), 10);
     const month = startDate ? new Date(startDate).toLocaleString('default', { month: 'long' }) : 'current';
