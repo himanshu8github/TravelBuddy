@@ -5,3 +5,4 @@ data.txtserver/.env.development
 .env.production
 node_modules/
 data.txt
+file.txt

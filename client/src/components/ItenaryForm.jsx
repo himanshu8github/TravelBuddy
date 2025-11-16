@@ -1,204 +1,426 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { getAuth, signOut } from 'firebase/auth';
+import { getAuth, signOut } from "firebase/auth";
+
+import TabButtons from "./itinerary/TabButtons";
+import CostPredictor from "./itinerary/CostPredictor";
+import WeatherForecast from "./itinerary/WeatherForecast";
+import PackingList from "./itinerary/PackingList";
+import RouteSuggestions from "./itinerary/RouteSuggestions";
+import LocalTips from "./itinerary/LocalTips";
+import Stays from "./itinerary/Stays";
+import Restaurants from "./itinerary/Restaurants";
+import DayWiseItinerary from "./itinerary/DayWiseItinerary";
+
+import {
+  FaPlane,
+  FaRegCalendarAlt,
+  FaUsers,
+  FaCoins,
+  FaMapMarkedAlt,
+} from "react-icons/fa";
+import { FiSend } from "react-icons/fi";
 
 const ItineraryPlanner = () => {
   const [form, setForm] = useState({
-    destination: '',
-    days: '',
-    groupType: '',
-    budget: '',
+    destination: "",
+    days: "",
+    groupType: "",
+    budget: "",
+    startDate: "",
   });
+
+  const [activeTab, setActiveTab] = useState("cost");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-
-  const payload = {
-    ...form,
-    tripType: form.groupType,
+  const calculateEndDate = () => {
+    if (!form.startDate || !form.days) return "";
+    const start = new Date(form.startDate);
+    const endDate = new Date(start);
+    endDate.setDate(start.getDate() + parseInt(form.days));
+    return endDate.toISOString().split("T")[0];
   };
-  delete payload.groupType;
 
-  try {
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/createitinerary`, payload);
-    setResult(res.data.data);
-  } catch (err) {
-    console.error('API Error:', err);
-  } finally {
-    setLoading(false);
-  }
-};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const endDate = calculateEndDate();
 
+    const payload = {
+      ...form,
+      tripType: form.groupType,
+      endDate,
+    };
+    delete payload.groupType;
+
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/createitinerary`,
+        payload
+      );
+      setResult(res.data.data);
+    } catch (err) {
+      console.error("API Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = async () => {
-    const auth = getAuth();
     try {
-      await signOut(auth);
-      navigate('/'); // Redirect to home after logout
+      await signOut(getAuth());
+      navigate("/");
     } catch (err) {
       console.error("Logout error:", err);
     }
   };
 
-  const handleConfirm = () => {
-    console.log("Confirmed! Save this plan to DB.");
-  };
-
   return (
-    <div className="min-h-screen bg-black text-white font-sans">
+    <div className="min-h-screen bg-gradient-to-b from-[#0a0a0b] via-[#0e0e10] to-black text-white font-sans">
       {/* Navbar */}
-   <nav className="bg-black px-4 py-4 shadow-md flex flex-col sm:flex-row sm:items-center sm:justify-between">
-
-  <div className="w-full text-center sm:text-left mb-2 sm:mb-0">
-    <h1 className="text-3xl font-bold text-white">TravelBuddy</h1>
-  </div>
-
-
-  <div className="flex flex-row justify-center sm:justify-end items-center gap-4 w-full sm:w-auto">
-    <Button variant="ghost" className="text-xl" onClick={() => navigate("/dashboard")}>
-      Home
-    </Button>
-
-    <Link to="/aiplanner">
-      <Button variant="ghost" className="text-xl">AiPlanner</Button>
-    </Link>
-
-    <Button className="bg-red-600 text-white" onClick={handleLogout}>
-      Logout
-    </Button>
-  </div>
-</nav>
-
-
-
-      {/* Main Section */}
-      <div className="p-6 max-w-6xl mx-auto">
-        <h1 className='text-4xl font-bold text-center mt-6 mb-2 text-purple-300'>Plan Your Next Adventure</h1>
-        <p className='text-center text-lg text-gray-300 mb-10'>Fill in the details and get a personalized itinerary.</p>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white text-black rounded-lg shadow-lg p-6 grid gap-4 grid-cols-1 md:grid-cols-2">
-          <h2 className="col-span-full text-xl font-semibold text-gray-800">✈️ Trip Details</h2>
-
-          <div className="col-span-full">
-            <label className="block text-sm font-medium mb-1">Where do you want to go?</label>
-            <input type="text" name="destination" placeholder="e.g. Rishikesh" onChange={handleChange} className="border p-2 rounded w-full" required />
-          </div>
-
+      <nav
+        className="bg-black/40 backdrop-blur-lg px-6 py-4 border-b sticky top-0 z-50"
+        style={{ borderColor: "rgba(255,175,189,0.18)" }} // soft pink border
+      >
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div>
-            <label className="block text-sm font-medium mb-1">How many days?</label>
-            <input type="number" name="days" placeholder="Number of Days" onChange={handleChange} className="border p-2 rounded w-full" required />
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-[#ffe5ec] via-[#ffcfd2] to-[#ff8fab] bg-clip-text text-transparent tracking-wide">
+              TravelBuddy
+            </h1>
+            <p className="text-xs text-gray-500">Plan. Explore. Adventure.</p>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">With whom?</label>
-            <select name="groupType" onChange={handleChange} className="border p-2 rounded w-full" required>
-              <option value="">Select</option>
-              <option value="friends">Friends</option>
-              <option value="family">Family</option>
-              <option value="couple">Couple</option>
-              <option value="solo">Solo</option>
-            </select>
-          </div>
-
-          <div className="col-span-full">
-            <label className="block text-sm font-medium mb-1">Your budget preference</label>
-            <select name="budget" onChange={handleChange} className="border p-2 rounded w-full" required>
-              <option value="">Select Budget</option>
-              <option value="cheap">Cheap</option>
-              <option value="moderate">Moderate</option>
-              <option value="luxury">Luxury</option>
-            </select>
-          </div>
-
-          <button type="submit" className="col-span-full bg-purple-700 hover:bg-purple-800 text-white py-2 rounded mt-2 font-semibold">
-            {loading ? "Generating..." : "Generate Itinerary"}
-          </button>
-        </form>
-
-        {/* Output Cards */}
-        {result && (
-          <div className="mt-16 space-y-14">
-
-            {/* Stays */}
-            <section>
-              <h2 className="text-3xl font-bold mb-6 text-purple-400">🏨 Suggested Stays</h2>
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {result.hostels?.map((hostel, idx) => (
-                  <div key={idx} className="bg-white text-black p-4 rounded-xl shadow-lg">
-                    <h3 className="text-xl font-bold text-purple-700">{hostel.name}</h3>
-                    <p className="text-sm text-gray-700">{hostel.location}</p>
-                    <p className="mt-1">💵 <strong>{hostel.pricePerNight}</strong> / night</p>
-                    <p>⭐ {hostel.rating}</p>
-                    <p className="text-sm mt-2">{hostel.description}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Restaurants */}
-            <section>
-              <h2 className="text-3xl font-bold mb-6 text-purple-400">🍽️ Recommended Restaurants</h2>
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {result.restaurants?.map((restro, idx) => (
-                  <div key={idx} className="bg-white text-black p-4 rounded-xl shadow-lg">
-                    <h3 className="text-xl font-bold text-purple-700">{restro.name}</h3>
-                    <p className="text-sm text-gray-700">{restro.location}</p>
-                    <p>🍛 Cuisine: {restro.cuisine}</p>
-                    <p>💵 Avg. Price: {restro.avgPrice}</p>
-                    <p>⭐ {restro.rating}</p>
-                    <p className="text-sm mt-2">{restro.description}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Day-wise Itinerary */}
-<section>
-  <h2 className="text-3xl font-bold mb-6 text-purple-400">🗓️ Day-wise Itinerary</h2>
-  <div className="space-y-6">
-    {result.itinerary?.map((dayPlan, dayIdx) => {
-      const showTicketInfo = parseInt(form.days) <= 20 || parseInt(dayPlan.day) <= 10;
-
-      return (
-        <div key={dayIdx} className="bg-white text-black p-6 rounded-xl shadow-lg">
-          <h3 className="text-xl font-bold text-purple-700 mb-2">Day {dayPlan.day}</h3>
-          <div className="space-y-3">
-            {dayPlan.activities?.map((act, actIdx) => (
-              <div key={actIdx} className="bg-gray-100 border-l-4 border-purple-600 p-4 rounded">
-                <p className="font-semibold">{act.placeName}</p>
-                <p className="text-sm">{act.details}</p>
-                {showTicketInfo && act.ticketPrice && (
-                  <p className="text-sm">🎟️ Ticket Price: {act.ticketPrice}</p>
-                )}
-              </div>
-            ))}
+          <div className="flex gap-3">
+            <Button
+              variant="ghost"
+              className="text-sm"
+              style={{ color: "#ffdfe5" }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(255,207,210,0.12)")}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+              onClick={() => navigate("/dashboard")}
+            >
+              Home
+            </Button>
+            <Link to="/aiplanner">
+              <Button
+                variant="ghost"
+                className="text-sm"
+                style={{ color: "#ffdfe5" }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(255,207,210,0.12)")}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+              >
+                AI Planner
+              </Button>
+            </Link>
+            <Button
+              className="text-sm"
+              style={{ backgroundColor: "#7a1d2f" }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#5e1624")}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#7a1d2f")}
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
           </div>
         </div>
-      );
-    })}
-  </div>
-</section>
+      </nav>
 
-            {/* Confirm Button */}
-            <div className="flex justify-center mt-10">
-              <button onClick={handleConfirm} className="bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-xl text-lg font-semibold transition">
-                ✅ Confirm This Plan
+      {/* Body */}
+      <div className="max-w-6xl mx-auto p-6">
+        {/* Hero */}
+        <div className="relative text-center py-16 overflow-hidden">
+          {/* Single subtle icon (fix: not three) */}
+        
+
+          <h1 className="animated-title text-5xl md:text-6xl font-extrabold mb-4 tracking-tight">
+            Plan Your Next Adventure
+          </h1>
+          <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
+            Calm, structured planning with realistic budgets, weather, routes &
+            local insights.
+          </p>
+
+          {/* Underline animation */}
+          <div
+            className="mx-auto mt-5 h-[3px] w-40 rounded-full animate-pulse-soft"
+            style={{
+              background: "linear-gradient(90deg,#ffe5ec,#ffcfd2,#ff8fab)",
+            }}
+          />
+        </div>
+
+        {/* Form */}
+        <div
+          className="bg-[#101014]/80 border backdrop-blur-md rounded-2xl p-8 shadow-xl"
+          style={{ borderColor: "rgba(255,175,189,0.22)" }}
+        >
+          <h2
+            className="text-2xl font-bold mb-7 flex items-center gap-3 tracking-wide"
+            style={{ color: "#ffdfe5" }}
+          >
+            <FaPlane style={{ color: "#ff8fab" }} /> Trip Details
+          </h2>
+
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-12 gap-6"
+          >
+            {/* Destination */}
+            <div className="md:col-span-6">
+              <label className="block text-sm mb-2" style={{ color: "#ffe5ec" }}>
+                Destination *
+              </label>
+              <div className="relative">
+                <FaMapMarkedAlt
+                  className="absolute left-3 top-1/2 -translate-y-1/2"
+                  style={{ color: "#f7b2c0" }}
+                />
+                <input
+                  type="text"
+                  name="destination"
+                  placeholder="e.g. Goa, Manali, Rishikesh"
+                  onChange={handleChange}
+                  required
+                  className="w-full pl-10 py-3 bg-[#0c0c12] border rounded-lg outline-none transition text-sm placeholder:text-gray-500 focus:ring-0"
+                  style={{
+                    borderColor: "rgba(255,175,189,0.25)",
+                    color: "#fef6f8",
+                  }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = "#fb6f92")}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,175,189,0.25)")}
+                />
+              </div>
+            </div>
+
+            {/* Start Date */}
+            <div className="md:col-span-3">
+              <label className="block text-sm mb-2" style={{ color: "#ffe5ec" }}>
+                Start Date *
+              </label>
+              <div className="relative">
+                <FaRegCalendarAlt
+                  className="absolute left-3 top-1/2 -translate-y-1/2"
+                  style={{ color: "#f7b2c0" }}
+                />
+                <input
+                  type="date"
+                  name="startDate"
+                  required
+                  onChange={handleChange}
+                  className="w-full pl-10 py-3 bg-[#0c0c12] border rounded-lg outline-none text-sm focus:ring-0"
+                  style={{
+                    borderColor: "rgba(255,175,189,0.25)",
+                    color: "#fef6f8",
+                  }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = "#fb6f92")}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,175,189,0.25)")}
+                />
+              </div>
+            </div>
+
+            {/* Days */}
+            <div className="md:col-span-3">
+              <label className="block text-sm mb-2" style={{ color: "#ffe5ec" }}>
+                Days *
+              </label>
+              <div className="relative">
+                <FaRegCalendarAlt
+                  className="absolute left-3 top-1/2 -translate-y-1/2"
+                  style={{ color: "#f7b2c0" }}
+                />
+                <input
+                  type="number"
+                  name="days"
+                  min="1"
+                  required
+                  onChange={handleChange}
+                  className="w-full pl-10 py-3 bg-[#0c0c12] border rounded-lg outline-none text-sm focus:ring-0"
+                  style={{
+                    borderColor: "rgba(255,175,189,0.25)",
+                    color: "#fef6f8",
+                  }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = "#fb6f92")}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,175,189,0.25)")}
+                />
+              </div>
+            </div>
+
+            {/* Group */}
+            <div className="md:col-span-4">
+              <label className="block text-sm mb-2" style={{ color: "#ffe5ec" }}>
+                Travel With *
+              </label>
+              <div className="relative">
+                <FaUsers
+                  className="absolute left-3 top-1/2 -translate-y-1/2"
+                  style={{ color: "#f7b2c0" }}
+                />
+                <select
+                  name="groupType"
+                  required
+                  onChange={handleChange}
+                  className="w-full pl-10 py-3 bg-[#0c0c12] border rounded-lg outline-none text-sm focus:ring-0"
+                  style={{
+                    borderColor: "rgba(255,175,189,0.25)",
+                    color: "#fef6f8",
+                    backgroundColor: "#0c0c12",
+                  }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = "#fb6f92")}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,175,189,0.25)")}
+                >
+                  <option value="">Select</option>
+                  <option value="friends">Friends</option>
+                  <option value="family">Family</option>
+                  <option value="couple">Couple</option>
+                  <option value="solo">Solo</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Budget */}
+            <div className="md:col-span-4">
+              <label className="block text-sm mb-2" style={{ color: "#ffe5ec" }}>
+                Budget *
+              </label>
+              <div className="relative">
+                <FaCoins
+                  className="absolute left-3 top-1/2 -translate-y-1/2"
+                  style={{ color: "#f7b2c0" }}
+                />
+                <select
+                  name="budget"
+                  required
+                  onChange={handleChange}
+                  className="w-full pl-10 py-3 bg-[#0c0c12] border rounded-lg outline-none text-sm focus:ring-0"
+                  style={{
+                    borderColor: "rgba(255,175,189,0.25)",
+                    color: "#fef6f8",
+                    backgroundColor: "#0c0c12",
+                  }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = "#fb6f92")}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(255,175,189,0.25)")}
+                >
+                  <option value="">Select</option>
+                  <option value="cheap">Low / Budget</option>
+                  <option value="moderate">Moderate</option>
+                  <option value="luxury">Luxury</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Removed End Date input (per request) */}
+            {/* We still compute endDate internally for payload */}
+
+            {/* Submit */}
+            <div className="md:col-span-12 flex justify-center pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="disabled:opacity-50 px-12 py-3 rounded-xl text-black font-bold tracking-wide text-sm flex items-center gap-2 transition-transform hover:scale-[1.02]"
+                style={{
+                  background: "linear-gradient(90deg,#ff8fab,#fb6f92)",
+                  boxShadow: "0 6px 20px rgba(251,111,146,0.22)",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.background =
+                    "linear-gradient(90deg,#ffcfd2,#fb6f92)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.background =
+                    "linear-gradient(90deg,#ff8fab,#fb6f92)")
+                }
+              >
+                <FiSend />
+                {loading ? "Generating..." : "Generate Itinerary"}
               </button>
             </div>
+          </form>
+        </div>
+
+        {/* Tabs */}
+        <div className="mt-10">
+          <TabButtons
+            activeTab={activeTab}
+            onTabClick={setActiveTab}
+            themeColor="pink"
+            includeItinerary
+            alwaysVisible
+            disabled={!result}
+          />
+        </div>
+
+        {/* Sections */}
+        {result && (
+          <div className="mt-10 space-y-12">
+            {activeTab === "cost" && <CostPredictor cost={result.cost} />}
+            {activeTab === "weather" && (
+              <WeatherForecast weather={result.weather} />
+            )}
+            {activeTab === "packing" && (
+              <PackingList packing={result.packing} />
+            )}
+            {activeTab === "route" && (
+              <RouteSuggestions routes={result.routes} />
+            )}
+            {activeTab === "tips" && <LocalTips tips={result.tips} />}
+            {activeTab === "stays" && <Stays stays={result.stays} />}
+            {activeTab === "restaurants" && (
+              <Restaurants restaurants={result.restaurants} />
+            )}
+            {activeTab === "itinerary" && (
+              <DayWiseItinerary itinerary={result.itinerary} days={form.days} />
+            )}
           </div>
         )}
       </div>
+
+      {/* Styles */}
+      <style>{`
+        .animated-title {
+          background: linear-gradient(90deg,#ffe5ec,#ffcfd2,#ff8fab,#ffe5ec);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          background-size: 300% 100%;
+          animation: shimmer 9s linear infinite, subtle-pop 700ms ease-out 1, float-y 8s ease-in-out infinite;
+          letter-spacing: .5px;
+        }
+        @keyframes shimmer {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes subtle-pop {
+          0% { transform: translateY(6px) scale(0.98); opacity: .9; }
+          100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        @keyframes float-y {
+          0%,100% { transform: translateY(0); }
+          50% { transform: translateY(-6px); }
+        }
+        .animate-pulse-soft {
+          animation: pulse-soft 2.6s ease-in-out infinite;
+        }
+        @keyframes pulse-soft {
+          0%, 100% { opacity: .35; transform: scaleX(0.98); }
+          50% { opacity: .7; transform: scaleX(1); }
+        }
+        .animate-float-slow {
+          animation: float-plane 10s ease-in-out infinite;
+        }
+        @keyframes float-plane {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          50% { transform: translateY(-8px) rotate(-2deg); }
+        }
+      `}</style>
     </div>
   );
 };
