@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate, Link } from "react-router-dom";
+import { useState } from "react";
 import useAuthStore from "../store/authstore";
 import { getAuth, signOut } from "firebase/auth";
 
@@ -36,7 +37,20 @@ const PaidPlans = () => {
     }
   };
 
+  // Toggle maintenanceMode to enable/disable payment flows on this page
+  const maintenanceMode = true;
+
+  const [showMaintenanceOverlay, setShowMaintenanceOverlay] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+
   const handleBuyNow = (planTitle) => {
+    if (maintenanceMode) {
+      // show full-screen maintenance overlay and simulate failing payment API
+      setSelectedPlan(planTitle);
+      setShowMaintenanceOverlay(true);
+      return Promise.reject(new Error("Payment service under maintenance"));
+    }
+
     if (user) {
       navigate("/payment", { state: { plan: planTitle } });
     } else {
@@ -94,6 +108,7 @@ const PaidPlans = () => {
           className="mx-auto mt-4 sm:mt-5 md:mt-6 h-[2px] sm:h-[3px] w-24 sm:w-32 md:w-40 rounded-full animate-pulse"
           style={{ background: "linear-gradient(90deg,#ffe5ec,#ffcfd2,#ff8fab)" }}
         />
+        {/* maintenance overlay handled below when triggered */}
       </div>
 
       {/* Plans */}
@@ -178,6 +193,19 @@ const PaidPlans = () => {
           );
         })}
       </div>
+
+      {showMaintenanceOverlay && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90">
+          <div className="max-w-lg w-full mx-4 bg-[#0b0b0c] border border-[#ff8fab44] rounded-xl p-6 text-center text-white">
+            <h3 className="text-2xl font-bold mb-2">Payment Options Unavailable</h3>
+            <p className="text-sm text-gray-300 mb-4">Our payment system is currently under maintenance. We&apos;re working to restore it shortly.</p>
+            {selectedPlan && <p className="text-xs text-gray-400 mb-4">Selected plan: {selectedPlan}</p>}
+            <div className="flex items-center justify-center">
+              <Button onClick={() => setShowMaintenanceOverlay(false)} className="px-6 py-2 bg-[#ff8fab] text-black">OK</Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         .animate-pulse { animation: pulse-soft 2.6s ease-in-out infinite; }
